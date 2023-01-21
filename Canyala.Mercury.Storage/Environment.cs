@@ -1,8 +1,26 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)reby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -55,18 +73,35 @@ namespace Canyala.Mercury.Storage
         /// <summary>
         /// Creates an environment.
         /// </summary>
-        /// <param name="heapFactory">A factory method for heap creation. Defaults to a single, memory based heap.</param>
-        private Environment(Strategy strategy = null)
+        /// <param name="heapFactory">
+        /// A factory method for heap creation.
+        /// Creates a heap according to strategy.
+        /// </param>
+        private Environment(Strategy strategy)
         {
-            _strategy = strategy ?? Strategy.SinglestoreInMemory(1048576);
+            _strategy = strategy;
             _heapFactory = _strategy.HeapFactory;
             _allocators = new Dictionary<Type, Allocator>();
             _heaps = new Dictionary<Type, Heap>();
             _anonymousRoots = new List<Object>();
         }
 
-        public static Environment Create(Strategy strategy = null)
-            { return new Environment(strategy); }
+        public static Environment Create(Strategy strategy)
+        { return new Environment(strategy); }
+
+        /// <summary>
+        /// Creates an environment.
+        /// </summary>
+        /// <param name="heapFactory">
+        /// A factory method for heap creation.
+        /// Creates a single, memory based heap.
+        /// </param>
+        private Environment() : this(Strategy.SinglestoreInMemory(1048576))
+        {
+        }
+
+        public static Environment Create()
+        { return new Environment(); }
 
         /// <summary>
         /// Maps a specific type to a heap.
@@ -75,8 +110,7 @@ namespace Canyala.Mercury.Storage
         /// <returns>The heap for type.</returns>
         public Heap Heap(Type type)
         {
-            Heap heap;
-            if (_heaps.TryGetValue(type, out heap))
+            if (_heaps.TryGetValue(type, out var heap))
                 return heap;
 
             heap = _heapFactory(type);
@@ -102,8 +136,7 @@ namespace Canyala.Mercury.Storage
         {
             var type = typeof(T);
 
-            Allocator allocator;
-            if (_allocators.TryGetValue(type, out allocator))
+            if (_allocators.TryGetValue(type, out var allocator))
                 return (Allocator<T>) allocator;
 
             if (type.IsPrimitive)

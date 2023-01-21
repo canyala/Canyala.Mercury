@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -52,7 +72,7 @@ namespace Canyala.Mercury.Rdf.Extensions
         /// <returns>A sequence of turtles.</returns>
         public static IEnumerable<string[]> AsTurtles(this IEnumerable<string[]> triples)
         {
-            string[] previous = null;
+            string[]? previous = null;
 
             foreach (var current in triples)
             {
@@ -119,7 +139,7 @@ namespace Canyala.Mercury.Rdf.Extensions
         /// <param name="turples">The triples or turtles.</param>
         /// <param name="namespaces">A dictionary where key is URI of a namespace and value is name of a namespace.</param>
         /// <returns>A sequence of lines that makes up the turtle docuemnt.</returns>
-        public static IEnumerable<string> AsTurtle(this IEnumerable<string[]> turples, Namespaces namespaces = null)
+        public static IEnumerable<string> AsTurtle(this IEnumerable<string[]> turples, Namespaces? namespaces = null)
             { return Turtle.AsLines(turples, namespaces); }
 
         /// <summary>
@@ -158,10 +178,10 @@ namespace Canyala.Mercury.Rdf.Extensions
         /// <param name="turples">A sequence of triples or turtles.</param>
         /// <param name="namespaces">A dictionary where key is URI of a namespace and value is name of a namespace.</param>
         /// <returns>A sequence of lines that represents the turples in rdf/xml format.</returns>
-        public static IEnumerable<string> AsRdfXml(this IEnumerable<string[]> turples, Namespaces namespaces = null)
+        public static IEnumerable<string> AsRdfXml(this IEnumerable<string[]> turples, Namespaces? namespaces = null)
             { return RdfXml.AsLines(turples, namespaces); }
 
-        public static IEnumerable<string> AsN3(this IEnumerable<string[]> turples, Namespaces namespaces = null)
+        public static IEnumerable<string> AsN3(this IEnumerable<string[]> turples, Namespaces? namespaces = null)
             { yield break; }
 
         #endregion

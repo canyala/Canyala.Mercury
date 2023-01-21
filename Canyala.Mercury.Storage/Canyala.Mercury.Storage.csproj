@@ -6,4 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Canyala.Lagoon\Canyala.Lagoon.Core\Canyala.Lagoon.Core.csproj" />
+  </ItemGroup>
 </Project>

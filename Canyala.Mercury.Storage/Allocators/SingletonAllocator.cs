@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -41,14 +61,33 @@ namespace Canyala.Mercury.Storage.Allocators
         /// </remarks>
         /// <param name="index">The heap to store the index in.</param>
         /// <param name="objects">The heap to store objects in, defaults to the index heap.</param>
-        public SingletonAllocator(Heap index, Heap objects=null)
+        public SingletonAllocator(Heap index, Heap objects)
         {
+            long Compare(long a, long b)
+            {
+                if (this[a] is IComparable<T> comparable)
+                    return comparable.CompareTo(this[b]);
+
+                throw new InvalidCastException($"Type {nameof(T)} does not support required {nameof(IComparable<T>)}");
+            }
+
             _index = new AATree(index, GetType().ReadableName() + ".Index", Compare);
-            _objects = objects ?? index;
+            _objects = objects;
         }
 
-        private long Compare(long a, long b)
-            { return (this[a] as IComparable<T>).CompareTo(this[b]); }
+        /// <summary>
+        /// Creates singleton allocator.
+        /// </summary>
+        /// <remarks>
+        /// A singleton allocator makes sure that space is reused, no duplicates
+        /// will be stored and reference counting is used to accomplish it.
+        /// </remarks>
+        /// <param name="index">The heap to store both the index and objects in.</param>
+        public SingletonAllocator(Heap index) : this(index, index)
+        {
+            ;
+        }
+
 
         /// <summary>
         /// Allocates and stores an item in a heap.
@@ -57,15 +96,14 @@ namespace Canyala.Mercury.Storage.Allocators
         /// <returns>The offset of the item in the heap.</returns>
         public override long Alloc(T item)
         {
-            var comparableItem = item as IComparable<T>;
-            Contract.Requires(comparableItem != null, "SingletonAllocator of T requires that T is an IComparable of T.");
-
             Action<long[]> init = data => { if (data[0] == 0) data[0] = AllocSingleton(item);  };
 
-            var offsets = _index.GetData(_index.Insert(data => comparableItem.CompareTo(this[data]), init));        
+            if (!(item is IComparable<T> comparableItem))
+                throw new InvalidCastException($"{nameof(SingletonAllocator<T>)} : Type {nameof(T)} does not support {nameof(IComparable<T>)}");
+
+            var offsets = _index.GetData(_index.Insert(data => comparableItem.CompareTo(this[data]), init));
             UInt32 references = _objects.Reader(offsets[0]).ReadUInt32();
             _objects.Writer(offsets[0]).Write(references + 1);
-
             return offsets[0];
         }
 
@@ -105,6 +143,9 @@ namespace Canyala.Mercury.Storage.Allocators
 
         private long AllocSingleton(T item)
         {
+            if (item is null)
+                throw new ArgumentNullException(nameof(item));
+
             var buffer = _serializer.Serialize(item);
             // We allocate +sizeof(Uint32) to make room for a count.
             var offset = _objects.Alloc(sizeof(UInt32) + buffer.Length);
@@ -117,8 +158,8 @@ namespace Canyala.Mercury.Storage.Allocators
 
         private void FreeSingleton(long offset)
         {
-            var comparableItem = this[offset] as IComparable<T>;
-            _index.Remove(data => comparableItem.CompareTo(this[data]), offsets => _objects.Free(offsets[0]));
+            if (this[offset] is IComparable<T> comparableItem)
+                _index.Remove(data => comparableItem.CompareTo(this[data]), offsets => _objects.Free(offsets[0]));
         }
 
         #endregion

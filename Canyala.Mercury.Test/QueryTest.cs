@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Linq;
@@ -15,32 +35,33 @@ using Canyala.Lagoon.Functional;
 using Canyala.Lagoon.Serialization;
 using Canyala.Lagoon.Text;
 
+using Canyala.Mercury;
 using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;
 
 using Canyala.Test.Tools;
 
-namespace Canyala.Mercury.Test
+namespace Canyala.Mercury.Test;
+
+[TestClass]
+public class QueryTest
 {
-    [TestClass]
-    public class QueryTest
+    /// <summary>
+    /// Written 2013-04-28 07.23
+    /// </summary>
+    [TestMethod]
+    public void QuerySimpleSparqlShouldWork()
     {
-        /// <summary>
-        /// Written 2013-04-28 07.23
-        /// </summary>
-        [TestMethod]
-        public void QuerySimpleSparqlShouldWork()
-        {
-            var turtleData = Turtle.FromText(@"
+        var turtleData = Turtle.FromText(@"
 
                 <http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> ""SPARQL Tutorial"" .
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 SELECT ?title
                 WHERE
@@ -49,22 +70,22 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "title" },
-                { @"""SPARQL Tutorial""" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMultipleMatchesSparqlShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "title" },
+            { @"""SPARQL Tutorial""" }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMultipleMatchesSparqlShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
@@ -76,9 +97,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
                 select ?name ?mbox
@@ -87,23 +108,23 @@ namespace Canyala.Mercury.Test
                     ?x foaf:mbox ?mbox }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "mbox" },
-                { "\"Johnny Lee Outlaw\"", "<mailto:jlow@example.com>" },
-                { "\"Peter Goodguy\"", "<mailto:peter@example.org>" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMultipleMatchesUsingGroupsSparqlShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "mbox" },
+            { "\"Johnny Lee Outlaw\"", "<mailto:jlow@example.com>" },
+            { "\"Peter Goodguy\"", "<mailto:peter@example.org>" }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMultipleMatchesUsingGroupsSparqlShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
@@ -115,9 +136,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
                 select ?name ?mbox
@@ -128,23 +149,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "mbox" },
-                { "\"Johnny Lee Outlaw\"", "<mailto:jlow@example.com>" },
-                { "\"Peter Goodguy\"", "<mailto:peter@example.org>" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMatchingRdfLiteralsSparqlShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "mbox" },
+            { "\"Johnny Lee Outlaw\"", "<mailto:jlow@example.com>" },
+            { "\"Peter Goodguy\"", "<mailto:peter@example.org>" }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMatchingRdfLiteralsSparqlShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix dt:   <http://example.org/datatype#> .
                 @prefix ns:   <http://example.org/ns#> .
@@ -157,24 +178,24 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery1 = @"SELECT ?v WHERE { ?v ?p ""cat"" }";
-            var actual1 = Sparql.Query(graph, sparqlQuery1);
-            var expected1 = new string[,] { { "v" } }.AsRows();
-            Assert.AreEqual(expected1.AsCsvText(), actual1.AsCsvText());
+        var sparqlQuery1 = @"SELECT ?v WHERE { ?v ?p ""cat"" }";
+        var actual1 = Sparql.Query(graph, sparqlQuery1);
+        var expected1 = new string[,] { { "v" } }.AsRows();
+        Assert.AreEqual(expected1.AsCsvText(), actual1.AsCsvText());
 
-            var sparqlQuery2 = @"SELECT ?v WHERE { ?v ?p ""cat""@en }";
-            var actual2 = Sparql.Query(graph, sparqlQuery2);
-            var expected2 = new string[,] { { "v" }, { "<http://example.org/ns#x>" } }.AsRows();
-            Assert.AreEqual(expected2.AsCsvText(), actual2.AsCsvText());
+        var sparqlQuery2 = @"SELECT ?v WHERE { ?v ?p ""cat""@en }";
+        var actual2 = Sparql.Query(graph, sparqlQuery2);
+        var expected2 = new string[,] { { "v" }, { "<http://example.org/ns#x>" } }.AsRows();
+        Assert.AreEqual(expected2.AsCsvText(), actual2.AsCsvText());
 
-        }
+    }
 
-        [TestMethod]
-        public void QueryMatchingIntegersSparqlShouldWork()
-        {
-            var turtleData = Turtle.FromText(@"
+    [TestMethod]
+    public void QueryMatchingIntegersSparqlShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix dt:   <http://example.org/datatype#> .
                 @prefix ns:   <http://example.org/ns#> .
@@ -187,24 +208,24 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 SELECT ?v WHERE { ?v ?p 42 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,] { { "v" }, { "<http://example.org/ns#y>" } }.AsRows();
+        var expected = new string[,] { { "v" }, { "<http://example.org/ns#y>" } }.AsRows();
 
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
 
-        [TestMethod]
-        public void QueryMatchingArbitraryDatatypeSparqlShouldWork()
-        {
-            var turtleData = Turtle.FromText(@"
+    [TestMethod]
+    public void QueryMatchingArbitraryDatatypeSparqlShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix dt:   <http://example.org/datatype#> .
                 @prefix ns:   <http://example.org/ns#> .
@@ -217,24 +238,24 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 SELECT ?v WHERE { ?v ?p ""abc""^^<http://example.org/datatype#specialDatatype> }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,] { { "v" }, { "<http://example.org/ns#z>" } }.AsRows();
+        var expected = new string[,] { { "v" }, { "<http://example.org/ns#z>" } }.AsRows();
 
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
 
-        [TestMethod]
-        public void QueryBlankNodeLabelsInQueryResultsShouldWork()
-        {
-            var turtleData = Turtle.FromText(@"
+    [TestMethod]
+    public void QueryBlankNodeLabelsInQueryResultsShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
@@ -243,25 +264,25 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
                 SELECT ?x ?name
                 WHERE  { ?x foaf:name ?name }
           ";
 
-            var actual = Sparql.Query(graph, sparqlQuery).ToArray();
+        var actual = Sparql.Query(graph, sparqlQuery).ToArray();
 
-            Assert.AreNotEqual("_:a", actual[1][0]);
-            Assert.AreNotEqual("_:d", actual[2][0]); 
-        }
+        Assert.AreNotEqual("_:a", actual[1][0]);
+        Assert.AreNotEqual("_:d", actual[2][0]); 
+    }
 
-        [TestMethod]
-        public void QueryCreatingValuesWithExpressionsShouldWork()
-        {
-            var turtleData = Turtle.FromText(@"
+    [TestMethod]
+    public void QueryCreatingValuesWithExpressionsShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
           
@@ -270,33 +291,33 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
                 SELECT ( CONCAT(?G, "" "", ?S) AS ?name )
                 WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"John Doe\"" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryEmptyGroupPatternShouldWork()
+        var expected = new string[,]
         {
-            var graph = Graph.Create();
+            { "name" },
+            { "\"John Doe\"" }
+        }
+        .AsRows();
 
-            var sparqlQuery = @"
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryEmptyGroupPatternShouldWork()
+    {
+        var graph = Graph.Create();
+
+        var sparqlQuery = @"
 
                 SELECT ?x
                 WHERE
@@ -304,13 +325,13 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery).ToArray();
-        }
+        var actual = Sparql.Query(graph, sparqlQuery).ToArray();
+    }
 
-        [TestMethod]
-        public void QueryOptionalPatternMatchingSparqlShouldWork()
-        {
-            var turtleData = Turtle.FromText(@"
+    [TestMethod]
+    public void QueryOptionalPatternMatchingSparqlShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix foaf:       <http://xmlns.com/foaf/0.1/> .
                 @prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -325,9 +346,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                 SELECT ?name ?mbox
@@ -336,24 +357,24 @@ namespace Canyala.Mercury.Test
                        }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "mbox" },
-                { "\"Alice\"", "<mailto:alice@example.com>" },
-                { "\"Alice\"", "<mailto:alice@work.example>" },
-                { "\"Bob\"", "" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMultipleOptionalGraphPatternsShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "mbox" },
+            { "\"Alice\"", "<mailto:alice@example.com>" },
+            { "\"Alice\"", "<mailto:alice@work.example>" },
+            { "\"Bob\"", "" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMultipleOptionalGraphPatternsShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix foaf:       <http://xmlns.com/foaf/0.1/> .
 
@@ -365,9 +386,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                 SELECT ?name ?mbox ?hpage
@@ -377,23 +398,23 @@ namespace Canyala.Mercury.Test
                        }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "mbox", "hpage" },
-                { "\"Alice\"", "", "<http://work.example.org/alice/>"  },
-                { "\"Bob\"", "<mailto:bob@work.example>", ""  },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMatchingAlternativesShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "mbox", "hpage" },
+            { "\"Alice\"", "", "<http://work.example.org/alice/>"  },
+            { "\"Bob\"", "<mailto:bob@work.example>", ""  },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMatchingAlternativesShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix dc10:  <http://purl.org/dc/elements/1.0/> .
                 @prefix dc11:  <http://purl.org/dc/elements/1.1/> .
@@ -409,9 +430,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
                 PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
@@ -420,25 +441,25 @@ namespace Canyala.Mercury.Test
                 WHERE  { { ?book dc10:title  ?title } UNION { ?book dc11:title  ?title } }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "title" },
-                { "\"SPARQL Query Language Tutorial\"" },
-                { "\"SPARQL\"" },
-                { "\"SPARQL (updated)\"" },
-                { "\"SPARQL Protocol Tutorial\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMatchingMultipleAlternativesShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "title" },
+            { "\"SPARQL Query Language Tutorial\"" },
+            { "\"SPARQL\"" },
+            { "\"SPARQL (updated)\"" },
+            { "\"SPARQL Protocol Tutorial\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMatchingMultipleAlternativesShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix dc10:  <http://purl.org/dc/elements/1.0/> .
                 @prefix dc11:  <http://purl.org/dc/elements/1.1/> .
@@ -454,9 +475,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
                 PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
@@ -465,25 +486,25 @@ namespace Canyala.Mercury.Test
                 WHERE  { { ?book dc10:title ?x } UNION { ?book dc11:title  ?y } }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "x", "y" },
-                { "\"SPARQL Query Language Tutorial\"", "" },
-                { "\"SPARQL\"", "" },
-                { "", "\"SPARQL (updated)\"" },
-                { "", "\"SPARQL Protocol Tutorial\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryMatchingCombinedAlternativesShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "x", "y" },
+            { "\"SPARQL Query Language Tutorial\"", "" },
+            { "\"SPARQL\"", "" },
+            { "", "\"SPARQL (updated)\"" },
+            { "", "\"SPARQL Protocol Tutorial\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryMatchingCombinedAlternativesShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix dc10:  <http://purl.org/dc/elements/1.0/> .
                 @prefix dc11:  <http://purl.org/dc/elements/1.1/> .
@@ -499,9 +520,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
                 PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
@@ -515,23 +536,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "title", "author" },
-                { "\"SPARQL Query Language Tutorial\"", "\"Alice\"" },
-                { "\"SPARQL Protocol Tutorial\"", "\"Bob\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryRemovingPossibleSolutionsShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "title", "author" },
+            { "\"SPARQL Query Language Tutorial\"", "\"Alice\"" },
+            { "\"SPARQL Protocol Tutorial\"", "\"Bob\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryRemovingPossibleSolutionsShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix :       <http://example/> .
                 @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -547,9 +568,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX :       <http://example/>
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
@@ -563,23 +584,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "s" },
-                { "<http://example/alice>" },
-                { "<http://example/carol>" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QuerySelectAsVariableShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "s" },
+            { "<http://example/alice>" },
+            { "<http://example/carol>" }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QuerySelectAsVariableShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix :       <http://example/> .
                 @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -598,9 +619,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX :       <http://example/>
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
@@ -612,24 +633,24 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "double" },
-                { "\"Alice\"", Literal.From(24) },
-                { "\"Bob\"", Literal.From(18) },
-                { "\"Carol\"", Literal.From(34) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryBindAsVariableShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "double" },
+            { "\"Alice\"", Literal.From(24) },
+            { "\"Bob\"", Literal.From(18) },
+            { "\"Carol\"", Literal.From(34) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryBindAsVariableShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix :       <http://example/> .
                 @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -648,9 +669,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX :       <http://example/>
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
@@ -663,24 +684,24 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "double" },
-                { "\"Alice\"", Literal.From(24) },
-                { "\"Bob\"", Literal.From(18) },
-                { "\"Carol\"", Literal.From(34) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryBindAndSelectAsVariableShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "double" },
+            { "\"Alice\"", Literal.From(24) },
+            { "\"Bob\"", Literal.From(18) },
+            { "\"Carol\"", Literal.From(34) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryBindAndSelectAsVariableShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix :       <http://example/> .
                 @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -699,9 +720,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX :       <http://example/>
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
@@ -714,24 +735,24 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "doubledouble" },
-                { "\"Alice\"", Literal.From(48) },
-                { "\"Bob\"", Literal.From(36) },
-                { "\"Carol\"", Literal.From(68) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryBindTerminatesGroupAsVariableShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "doubledouble" },
+            { "\"Alice\"", Literal.From(48) },
+            { "\"Bob\"", Literal.From(36) },
+            { "\"Carol\"", Literal.From(68) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryBindTerminatesGroupAsVariableShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
 
                 @prefix :       <http://example/> .
                 @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -753,9 +774,9 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX :       <http://example/>
                 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
@@ -770,24 +791,24 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "name", "doubledouble", "halfgrade" },
-                { "\"Alice\"", Literal.From(48), Literal.From(1M) },
-                { "\"Bob\"", Literal.From(36), Literal.From(0.5M) },
-                { "\"Carol\"", Literal.From(68), Literal.From(2M) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QuerySelectWithValuesShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "name", "doubledouble", "halfgrade" },
+            { "\"Alice\"", Literal.From(48), Literal.From(1M) },
+            { "\"Bob\"", Literal.From(36), Literal.From(0.5M) },
+            { "\"Carol\"", Literal.From(68), Literal.From(2M) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QuerySelectWithValuesShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix dc:   <http://purl.org/dc/elements/1.1/> .
                 @prefix :     <http://example.org/book/> .
                 @prefix ns:   <http://example.org/ns#> .
@@ -798,9 +819,9 @@ namespace Canyala.Mercury.Test
                 :book2  ns:price  23 .
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX dc:   <http://purl.org/dc/elements/1.1/> 
                 PREFIX :     <http://example.org/book/> 
@@ -814,22 +835,22 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "book", "title", "price" },
-                { "<http://example.org/book/book1>", "\"SPARQL Tutorial\"", Literal.From(42) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QuerySelectAllShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "book", "title", "price" },
+            { "<http://example.org/book/book1>", "\"SPARQL Tutorial\"", Literal.From(42) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QuerySelectAllShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix dc:   <http://purl.org/dc/elements/1.1/> .
                 @prefix :     <http://example.org/book/> .
                 @prefix ns:   <http://example.org/ns#> .
@@ -840,9 +861,9 @@ namespace Canyala.Mercury.Test
                 :book2  ns:price  23 .
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX dc:   <http://purl.org/dc/elements/1.1/> 
                 PREFIX :     <http://example.org/book/> 
@@ -863,22 +884,22 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "book", "title" },
-                { "<http://example.org/book/book1>", "\"SPARQL Tutorial\"" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QuerySelectWithValuesUndefShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "book", "title" },
+            { "<http://example.org/book/book1>", "\"SPARQL Tutorial\"" }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QuerySelectWithValuesUndefShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix dc:   <http://purl.org/dc/elements/1.1/> .
                 @prefix :     <http://example.org/book/> .
                 @prefix ns:   <http://example.org/ns#> .
@@ -889,9 +910,9 @@ namespace Canyala.Mercury.Test
                 :book2  ns:price  23 .
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX dc:   <http://purl.org/dc/elements/1.1/> 
                 PREFIX :     <http://example.org/book/> 
@@ -908,23 +929,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "book", "title", "price" },
-                { "<http://example.org/book/book1>", "\"SPARQL Tutorial\"", Literal.From(42) },
-                { "<http://example.org/book/book2>", "\"The Semantic Web\"", Literal.From(23) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryConstructShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "book", "title", "price" },
+            { "<http://example.org/book/book1>", "\"SPARQL Tutorial\"", Literal.From(42) },
+            { "<http://example.org/book/book2>", "\"The Semantic Web\"", Literal.From(23) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryConstructShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix  foaf:  <http://xmlns.com/foaf/0.1/> .
 
                 _:a    foaf:givenname   ""Alice"" .
@@ -934,9 +955,9 @@ namespace Canyala.Mercury.Test
                 _:b    foaf:surname     ""Hacker"" .
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
                 PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
@@ -951,21 +972,21 @@ namespace Canyala.Mercury.Test
                  }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "s", "p", "o" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(7, actual.Count());
-        }
-
-        [TestMethod]
-        public void QueryAskShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "s", "p", "o" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(7, actual.Count());
+    }
+
+    [TestMethod]
+    public void QueryAskShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix  foaf:  <http://xmlns.com/foaf/0.1/> .
 
                 _:a    foaf:givenname   ""Alice"" .
@@ -975,9 +996,9 @@ namespace Canyala.Mercury.Test
                 _:b    foaf:surname     ""Hacker"" .
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
                 PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
@@ -990,22 +1011,22 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "ask" },
-                { Literal.From(true) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryFilterExistsShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "ask" },
+            { Literal.From(true) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryFilterExistsShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix  :       <http://example/> .
                 @prefix  rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
                 @prefix  foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -1015,9 +1036,9 @@ namespace Canyala.Mercury.Test
                 :bob    rdf:type   foaf:Person .
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX  rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
                 PREFIX  foaf:   <http://xmlns.com/foaf/0.1/> 
@@ -1030,31 +1051,31 @@ namespace Canyala.Mercury.Test
                 }  
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "person" },
-                { "<http://example/bob>" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryLimitAndOffsetShouldWork()
+        var expected = new string[,]
         {
-            var turtleData = Turtle.FromText(@"
+            { "person" },
+            { "<http://example/bob>" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryLimitAndOffsetShouldWork()
+    {
+        var turtleData = Turtle.FromText(@"
                 @prefix  :       <http://example/> .
 
                 :alice  :hasBook ""Foundation"", ""I Robot"", ""Catcher in the rye"", ""Semantic web for the working ontoligist"", ""Programming the semantic web"".
                 
             ");
 
-            var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(turtleData);
 
-            var sparqlQuery = @"
+        var sparqlQuery = @"
 
                 PREFIX  :    <http://example/> 
 
@@ -1068,18 +1089,17 @@ namespace Canyala.Mercury.Test
                 OFFSET 2
             ";
 
-            var actual = Sparql.Query(graph, sparqlQuery);
+        var actual = Sparql.Query(graph, sparqlQuery);
 
-            var expected = new string[,]
-            {
-                { "book" },
-                { "\"I Robot\"" },
-                { "\"Programming the semantic web\"" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+        var expected = new string[,]
+        {
+            { "book" },
+            { "\"I Robot\"" },
+            { "\"Programming the semantic web\"" }
         }
+        .AsRows();
 
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
     }
+
 }

@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -37,7 +57,7 @@ namespace Canyala.Mercury.Rdf
         /// <param name="triples">Triples as a sequence of string arrays.</param>
         /// <param name="namespaces">A namespaces object declaring base and prefixes to use.</param>
         /// <returns>A turtle document as a text string.</returns>
-        public static string AsText(IEnumerable<string[]> triples, Namespaces namespaces = null)
+        public static string AsText(IEnumerable<string[]> triples, Namespaces? namespaces = null)
         {
             var text = new StringBuilder();
 
@@ -47,7 +67,7 @@ namespace Canyala.Mercury.Rdf
             return text.ToString();
         }
 
-        public static string PrefixesAsText(Namespaces namespaces = null)
+        public static string PrefixesAsText(Namespaces? namespaces = null)
         {
             var text = new StringBuilder();
 
@@ -57,7 +77,7 @@ namespace Canyala.Mercury.Rdf
             return text.ToString();
         }
 
-        public static string TurtlesAsText(IEnumerable<string[]> triples, Namespaces namespaces = null)
+        public static string TurtlesAsText(IEnumerable<string[]> triples, Namespaces? namespaces = null)
         {
             var text = new StringBuilder();
 
@@ -73,7 +93,7 @@ namespace Canyala.Mercury.Rdf
         /// <param name="triples">Triples as of a sequence of string arrays.</param>
         /// <param name="namespaces">A namespaces object declaring base and prefixes to use.</param>
         /// <returns>A turtle document as a sequence of text line strings.</returns>
-        public static IEnumerable<string> AsLines(IEnumerable<string[]> triples, Namespaces namespaces = null)
+        public static IEnumerable<string> AsLines(IEnumerable<string[]> triples, Namespaces? namespaces = null)
         {
             foreach (var line in PrefixesAsLines(namespaces))
                 yield return line;
@@ -82,18 +102,18 @@ namespace Canyala.Mercury.Rdf
                 yield return line;
         }
 
-        public static IEnumerable<string> PrefixesAsLines(Namespaces namespaces = null)
+        public static IEnumerable<string> PrefixesAsLines(Namespaces? namespaces = null)
         {
             if (namespaces != null)
                 foreach (var binding in namespaces)
                     yield return "@prefix {0}: <{1}> .".Args(binding.Prefix, binding.Namespace);
         }
 
-        public static IEnumerable<string> TurtlesAsLines(IEnumerable<string[]> triples, Namespaces namespaces = null)
+        public static IEnumerable<string> TurtlesAsLines(IEnumerable<string[]> triples, Namespaces? namespaces = null)
         {
             triples = triples.AsTurtles();
             namespaces = namespaces ?? new Namespaces();
-            Resource[] previous = null;
+            Resource[]? previous = null;
 
             foreach (var resources in triples.AsResources(namespaces))
             {

@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -11,19 +31,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
+using Canyala.Mercury;
 using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;
 
-namespace Canyala.Mercury.Test
+namespace Canyala.Mercury.Test;
+
+[TestClass]
+public class QueryGroupByTest
 {
-    [TestClass]
-    public class QueryGroupByTest
+    [TestMethod]
+    public void QueryAggregateShouldWork()
     {
-        [TestMethod]
-        public void QueryAggregateShouldWork()
-        {
-            var data = Turtle.FromText(@"
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -39,7 +60,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (SUM(?lprice) AS ?totalPrice)
@@ -51,24 +72,24 @@ namespace Canyala.Mercury.Test
                 GROUP BY ?org
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "totalPrice" },
-                { Literal.From(21) },
-                { Literal.From(7) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateExpressionShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "totalPrice" },
+            { Literal.From(21) },
+            { Literal.From(7) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateExpressionShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -84,7 +105,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT ( (MIN(?lprice)+MAX(?lprice))/2 AS ?averagePrice)
@@ -96,24 +117,24 @@ namespace Canyala.Mercury.Test
                 GROUP BY ?org
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "averagePrice" },
-                { Literal.From(6.5m) },
-                { Literal.From(6m) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithHavingShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "averagePrice" },
+            { Literal.From(6.5m) },
+            { Literal.From(6m) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithHavingShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -129,7 +150,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (SUM(?lprice) AS ?totalPrice)
@@ -142,23 +163,23 @@ namespace Canyala.Mercury.Test
                 HAVING (SUM(?lprice) > 10)
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "totalPrice" },
-                { Literal.From(21) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithDistinctShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "totalPrice" },
+            { Literal.From(21) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithDistinctShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -177,7 +198,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (SUM(?lprice) AS ?totalPrice) (SUM(DISTINCT ?lprice) as ?distinctPrice)
@@ -189,24 +210,24 @@ namespace Canyala.Mercury.Test
                 GROUP BY ?org
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "totalPrice", "distinctPrice" },
-                { Literal.From(26), Literal.From(21) },
-                { Literal.From(14), Literal.From(7) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithCountAllShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "totalPrice", "distinctPrice" },
+            { Literal.From(26), Literal.From(21) },
+            { Literal.From(14), Literal.From(7) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithCountAllShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -225,7 +246,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (Count(*) AS ?count)
@@ -236,23 +257,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "count" },
-                { Literal.From(6) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithCountAllDistinctShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "count" },
+            { Literal.From(6) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithCountAllDistinctShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -271,7 +292,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (Count(DISTINCT *) AS ?count)
@@ -281,23 +302,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "count" },
-                { Literal.From(9) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithCountExpressionShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "count" },
+            { Literal.From(9) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithCountExpressionShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -316,7 +337,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (Count(?lprice) AS ?count)
@@ -327,23 +348,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "count" },
-                { Literal.From(6) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithCountDistinctExpressionShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "count" },
+            { Literal.From(6) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithCountDistinctExpressionShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -362,7 +383,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT (Count(DISTINCT ?lprice) AS ?count)
@@ -373,23 +394,23 @@ namespace Canyala.Mercury.Test
                 }
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "count" },
-                { Literal.From(3) }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithGroupConcatShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "count" },
+            { Literal.From(3) }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithGroupConcatShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -408,7 +429,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT ?org (GROUP_CONCAT(?lprice) AS ?prices)
@@ -420,25 +441,25 @@ namespace Canyala.Mercury.Test
                 GROUP BY ?org
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
-            var ns = Namespace.FromUri("http://books.example/");
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
+        var ns = Namespace.FromUri("http://books.example/");
 
-            var expected = new string[,]
-            {
-                { "org", "prices" },
-                { ns["org1"], "\"9 5 7 5\"" },
-                { ns["org2"], "\"7 7\"" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void QueryAggregateWithGroupConcatAndSeparatorShouldWork()
+        var expected = new string[,]
         {
-            var data = Turtle.FromText(@"
+            { "org", "prices" },
+            { ns["org1"], "\"9 5 7 5\"" },
+            { ns["org2"], "\"7 7\"" }
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void QueryAggregateWithGroupConcatAndSeparatorShouldWork()
+    {
+        var data = Turtle.FromText(@"
 
                 @prefix : <http://books.example/> .
 
@@ -457,7 +478,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX : <http://books.example/>
                 SELECT ?org (GROUP_CONCAT(?lprice; SEPARATOR = "";"") AS ?prices)
@@ -469,19 +490,18 @@ namespace Canyala.Mercury.Test
                 GROUP BY ?org
             ";
 
-            var dataset = Graph.Create(data);
-            var actual = Sparql.Query(dataset, sparql);
-            var ns = Namespace.FromUri("http://books.example/");
+        var dataset = Graph.Create(data);
+        var actual = Sparql.Query(dataset, sparql);
+        var ns = Namespace.FromUri("http://books.example/");
 
-            var expected = new string[,]
-            {
-                { "org", "prices" },
-                { ns["org1"], "\"9;5;7;5\"" },
-                { ns["org2"], "\"7;7\"" }
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+        var expected = new string[,]
+        {
+            { "org", "prices" },
+            { ns["org1"], "\"9;5;7;5\"" },
+            { ns["org2"], "\"7;7\"" }
         }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
     }
 }

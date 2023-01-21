@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -23,7 +43,7 @@ namespace Canyala.Mercury.Storage.Collections
     /// Provides a persisted generic set.
     /// </summary>
     /// <typeparam name="T">Element type.</typeparam>
-    public class SortedHeapSet<T> : Object, ISet<T>, IOrderedCollection<T,T>
+    public class SortedHeapSet<T> : Storage.Object, ISet<T>, IOrderedCollection<T,T>
     {
         private readonly Allocator<T> _objects;
         private readonly AATree _tree;
@@ -58,7 +78,12 @@ namespace Canyala.Mercury.Storage.Collections
         }
 
         private long Compare(long a, long b)
-            { return (_objects[a] as IComparable<T>).CompareTo(_objects[b]); }
+        {
+            if (_objects[a] is IComparable<T> comparable)
+                return comparable.CompareTo(_objects[b]);
+
+            throw new InvalidCastException($"{typeof(T).Name} does not implement {typeof(IComparable<T>).Name}");
+        }
 
         /// <summary>
         /// The heap offset of the set.
@@ -117,9 +142,11 @@ namespace Canyala.Mercury.Storage.Collections
         /// <returns>A sequence of items.</returns>
         public IEnumerable<T> Enumerate(T value, bool ascending, bool inclusive)
         {
-            var comparableItem = value as IComparable<T>;
-            foreach (var nodeData in _tree.Enumerate(data => comparableItem.CompareTo(_objects[data]), ascending, inclusive))
-                yield return _objects[nodeData[0]];
+            if (value is IComparable<T> comparableItem)
+                foreach (var nodeData in _tree.Enumerate(data => comparableItem.CompareTo(_objects[data]), ascending, inclusive))
+                    yield return _objects[nodeData[0]];
+
+            throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
         }
 
         /// <summary>
@@ -132,8 +159,11 @@ namespace Canyala.Mercury.Storage.Collections
         /// <returns></returns>
         public IEnumerable<T> Enumerate(T lowValue, T highValue, bool ascending, bool inclusive)
         {
-            var lowComparable = lowValue as IComparable<T>;
-            var highComparable = highValue as IComparable<T>;
+            if (!(lowValue is IComparable lowComparable))
+                throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
+
+            if (!(highValue is IComparable<T> highComparable))
+                throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
 
             Func<long,long> lowComparer = data => lowComparable.CompareTo(_objects[data]);
             Func<long,long> highComparer = data => highComparable.CompareTo(_objects[data]);
@@ -184,8 +214,10 @@ namespace Canyala.Mercury.Storage.Collections
                 }
             };
 
-            var comparableItem = item as IComparable<T>;
-            _tree.Insert(data => comparableItem.CompareTo(_objects[data]), make); 
+            if (item is IComparable comparable)
+                _tree.Insert(data => comparable.CompareTo(_objects[data]), make);
+            else
+                throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
 
             return allocated;
         }
@@ -385,8 +417,10 @@ namespace Canyala.Mercury.Storage.Collections
         /// <returns>true if item is a member, otherwize false.</returns>
         public bool Contains(T item)
         { 
-            var comparableItem = item as IComparable<T>;
-            return _tree.Search(data => comparableItem.CompareTo(_objects[data])) != null; 
+            if (item is IComparable comparable)
+                return _tree.Search(data => comparable.CompareTo(_objects[data])) != null;
+
+            throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
         }
 
         /// <summary>
@@ -419,9 +453,11 @@ namespace Canyala.Mercury.Storage.Collections
         { 
             bool invoked = false;
             Action<long[]> free = data => { invoked = true; _objects.Free(data[0]); };
-            var comparableItem = item as IComparable<T>;
 
-            _tree.Remove(data => comparableItem.CompareTo(_objects[data]), free); 
+            if (item is IComparable comparable)
+                _tree.Remove(compareTo: data => comparable.CompareTo(_objects[data]), free);
+            else
+                throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
 
             return invoked;
         }
@@ -438,14 +474,7 @@ namespace Canyala.Mercury.Storage.Collections
 
         public bool TryGet(T key, out T value)
         {
-            if (Contains(key))
-            {
-                value = key;
-                return true;
-            }
-
-            value = default(T);
-            return false;
+            return (Contains(value = key)); // Assignment intended.
         }
 
         public T KeyOf(T element)

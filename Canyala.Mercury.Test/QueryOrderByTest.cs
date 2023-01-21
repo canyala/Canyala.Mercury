@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -11,16 +31,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
+using Canyala.Mercury;
 using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;
 
-namespace Canyala.Mercury.Test
+namespace Canyala.Mercury.Test;
+
+[TestClass]
+public class QueryOrderByTest
 {
-    [TestClass]
-    public class QueryOrderByTest
-    {
-        static IEnumerable<string[]> triples = Turtle.FromText(@"
+    static IEnumerable<string[]> triples = Turtle.FromText(@"
 
                 @prefix :       <http://example/> .
                 @prefix foaf:   <http://xmlns.com/foaf/0.1/> .
@@ -42,10 +63,10 @@ namespace Canyala.Mercury.Test
 
             ");
 
-        [TestMethod]
-        public void TestOrderByOneVar()
-        {
-            var sparql = @"
+    [TestMethod]
+    public void TestOrderByOneVar()
+    {
+        var sparql = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 
@@ -55,25 +76,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"Alice\"" },
-                { "\"Bob\"" },
-                { "\"Carol\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByOneVarAscending()
+        var expected = new string[,]
         {
-            var sparql = @"
+            { "name" },
+            { "\"Alice\"" },
+            { "\"Bob\"" },
+            { "\"Carol\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByOneVarAscending()
+    {
+        var sparql = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 
@@ -83,25 +104,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"Alice\"" },
-                { "\"Bob\"" },
-                { "\"Carol\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByOneVarDescending()
+        var expected = new string[,]
         {
-            var sparql = @"
+            { "name" },
+            { "\"Alice\"" },
+            { "\"Bob\"" },
+            { "\"Carol\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByOneVarDescending()
+    {
+        var sparql = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 
@@ -111,25 +132,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"Carol\"" },
-                { "\"Bob\"" },
-                { "\"Alice\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByOneBind()
+        var expected = new string[,]
         {
-            var sparql = @"
+            { "name" },
+            { "\"Carol\"" },
+            { "\"Bob\"" },
+            { "\"Alice\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByOneBind()
+    {
+        var sparql = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 
@@ -139,25 +160,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"Carol\"" },
-                { "\"Alice\"" },
-                { "\"Bob\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByOneBindAsc()
+        var expected = new string[,]
         {
-            var sparql = @"
+            { "name" },
+            { "\"Carol\"" },
+            { "\"Alice\"" },
+            { "\"Bob\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByOneBindAsc()
+    {
+        var sparql = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 
@@ -167,25 +188,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"Carol\"" },
-                { "\"Alice\"" },
-                { "\"Bob\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByOneBindDesc()
+        var expected = new string[,]
         {
-            var sparql = @"
+            { "name" },
+            { "\"Carol\"" },
+            { "\"Alice\"" },
+            { "\"Bob\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByOneBindDesc()
+    {
+        var sparql = @"
 
                 PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
 
@@ -195,25 +216,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
 
-            var expected = new string[,]
-            {
-                { "name" },
-                { "\"Bob\"" },
-                { "\"Alice\"" },
-                { "\"Carol\"" },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByTwoAscAsc()
+        var expected = new string[,]
         {
-            var triples = Turtle.FromText(@"
+            { "name" },
+            { "\"Bob\"" },
+            { "\"Alice\"" },
+            { "\"Carol\"" },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByTwoAscAsc()
+    {
+        var triples = Turtle.FromText(@"
 
             @prefix :        <http://example/> .
             @prefix letter:  <http://example/letter#> .
@@ -229,7 +250,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX :       <http://example/>
                 PREFIX letter: <http://example/letter#>
@@ -240,31 +261,31 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
-            var letter = Namespace.FromUri("http://example/letter#");
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
+        var letter = Namespace.FromUri("http://example/letter#");
 
-            var expected = new string[,]
-            {
-                { "letter", "number" },
-                { letter["D"], Literal.From(3) },
-                { letter["F"], Literal.From(1) },
-                { letter["L"], Literal.From(4) },
-                { letter["L"], Literal.From(5) },
-                { letter["X"], Literal.From(2) },
-                { letter["X"], Literal.From(3) },
-                { letter["Z"], Literal.From(8) },
-                { letter["Z"], Literal.From(9) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByTwoAscDesc()
+        var expected = new string[,]
         {
-            var triples = Turtle.FromText(@"
+            { "letter", "number" },
+            { letter["D"], Literal.From(3) },
+            { letter["F"], Literal.From(1) },
+            { letter["L"], Literal.From(4) },
+            { letter["L"], Literal.From(5) },
+            { letter["X"], Literal.From(2) },
+            { letter["X"], Literal.From(3) },
+            { letter["Z"], Literal.From(8) },
+            { letter["Z"], Literal.From(9) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByTwoAscDesc()
+    {
+        var triples = Turtle.FromText(@"
 
             @prefix :        <http://example/> .
             @prefix letter:  <http://example/letter#> .
@@ -280,7 +301,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX :       <http://example/>
                 PREFIX letter: <http://example/letter#>
@@ -291,31 +312,31 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
-            var letter = Namespace.FromUri("http://example/letter#");
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
+        var letter = Namespace.FromUri("http://example/letter#");
 
-            var expected = new string[,]
-            {
-                { "letter", "number" },
-                { letter["D"], Literal.From(3) },
-                { letter["F"], Literal.From(1) },
-                { letter["L"], Literal.From(5) },
-                { letter["L"], Literal.From(4) },
-                { letter["X"], Literal.From(3) },
-                { letter["X"], Literal.From(2) },
-                { letter["Z"], Literal.From(9) },
-                { letter["Z"], Literal.From(8) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByTwoAscDescDesc()
+        var expected = new string[,]
         {
-            var triples = Turtle.FromText(@"
+            { "letter", "number" },
+            { letter["D"], Literal.From(3) },
+            { letter["F"], Literal.From(1) },
+            { letter["L"], Literal.From(5) },
+            { letter["L"], Literal.From(4) },
+            { letter["X"], Literal.From(3) },
+            { letter["X"], Literal.From(2) },
+            { letter["Z"], Literal.From(9) },
+            { letter["Z"], Literal.From(8) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByTwoAscDescDesc()
+    {
+        var triples = Turtle.FromText(@"
 
             @prefix :        <http://example/> .
             @prefix letter:  <http://example/letter#> .
@@ -331,7 +352,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX :       <http://example/>
                 PREFIX letter: <http://example/letter#>
@@ -342,31 +363,31 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
-            var letter = Namespace.FromUri("http://example/letter#");
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
+        var letter = Namespace.FromUri("http://example/letter#");
 
-            var expected = new string[,]
-            {
-                { "letter", "number" },
-                { letter["Z"], Literal.From(9) },
-                { letter["Z"], Literal.From(8) },
-                { letter["X"], Literal.From(3) },
-                { letter["X"], Literal.From(2) },
-                { letter["L"], Literal.From(5) },
-                { letter["L"], Literal.From(4) },
-                { letter["F"], Literal.From(1) },
-                { letter["D"], Literal.From(3) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
-        }
-
-        [TestMethod]
-        public void TestOrderByTwoDescAsc()
+        var expected = new string[,]
         {
-            var triples = Turtle.FromText(@"
+            { "letter", "number" },
+            { letter["Z"], Literal.From(9) },
+            { letter["Z"], Literal.From(8) },
+            { letter["X"], Literal.From(3) },
+            { letter["X"], Literal.From(2) },
+            { letter["L"], Literal.From(5) },
+            { letter["L"], Literal.From(4) },
+            { letter["F"], Literal.From(1) },
+            { letter["D"], Literal.From(3) },
+        }
+        .AsRows();
+
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+    }
+
+    [TestMethod]
+    public void TestOrderByTwoDescAsc()
+    {
+        var triples = Turtle.FromText(@"
 
             @prefix :        <http://example/> .
             @prefix letter:  <http://example/letter#> .
@@ -382,7 +403,7 @@ namespace Canyala.Mercury.Test
 
             ");
 
-            var sparql = @"
+        var sparql = @"
 
                 PREFIX :       <http://example/>
                 PREFIX letter: <http://example/letter#>
@@ -393,26 +414,25 @@ namespace Canyala.Mercury.Test
 
             ";
 
-            var dataset = Graph.Create(triples);
-            var actual = Sparql.Query(dataset, sparql);
-            var letter = Namespace.FromUri("http://example/letter#");
+        var dataset = Graph.Create(triples);
+        var actual = Sparql.Query(dataset, sparql);
+        var letter = Namespace.FromUri("http://example/letter#");
 
-            var expected = new string[,]
-            {
-                { "letter", "number" },
-                { letter["Z"], Literal.From(8) },
-                { letter["Z"], Literal.From(9) },
-                { letter["X"], Literal.From(2) },
-                { letter["X"], Literal.From(3) },
-                { letter["L"], Literal.From(4) },
-                { letter["L"], Literal.From(5) },
-                { letter["F"], Literal.From(1) },
-                { letter["D"], Literal.From(3) },
-            }
-            .AsRows();
-
-            Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
+        var expected = new string[,]
+        {
+            { "letter", "number" },
+            { letter["Z"], Literal.From(8) },
+            { letter["Z"], Literal.From(9) },
+            { letter["X"], Literal.From(2) },
+            { letter["X"], Literal.From(3) },
+            { letter["L"], Literal.From(4) },
+            { letter["L"], Literal.From(5) },
+            { letter["F"], Literal.From(1) },
+            { letter["D"], Literal.From(3) },
         }
+        .AsRows();
 
+        Assert.AreEqual(expected.AsCsvText(), actual.AsCsvText());
     }
+
 }

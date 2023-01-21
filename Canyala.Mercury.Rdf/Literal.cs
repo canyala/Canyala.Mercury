@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2013 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -23,14 +43,14 @@ namespace Canyala.Mercury.Rdf
     /// </summary>
     public class Literal : Resource
     {
-        private string _value;
-        private string _language;
-        private Iri _type;
+        private readonly string _value;
+        private readonly string? _language;
+        private readonly Iri? _type;
 
         internal Literal(string text, Namespaces namespaces)
         {
             string quote;
-            text = text.TrimStartAny(out quote, "'''", "\"\"\"", "\"", "'");
+            text = text.TrimStartAny(out quote!, "'''", "\"\"\"", "\"", "'");
             var endQuote = FindEndQuote(quote, text);
 
             _value = DecodeEscape(text.Substring(0, endQuote));
@@ -55,7 +75,7 @@ namespace Canyala.Mercury.Rdf
             _language = language;
         }
 
-        internal Literal(string value, Iri type)
+        internal Literal(string value, Iri? type)
         {
             _value = value;
             _type = type;
@@ -262,11 +282,11 @@ namespace Canyala.Mercury.Rdf
             return text.IndexOf(quote);
         }
 
-        public Iri Type 
+        public Iri? Type 
             { get { return _type; } }
 
         public string Language 
-            { get { return _language; } }
+            { get { return _language!; } }
 
         public override string Value
             { get { return _value; } }
@@ -308,10 +328,9 @@ namespace Canyala.Mercury.Rdf
             return Full;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var other = obj as Literal;
-            return other != null && Full == other.Full;
+            return obj is Literal other && Full == other.Full;
         }
 
         public override int GetHashCode()
@@ -404,34 +423,34 @@ namespace Canyala.Mercury.Rdf
         #region FromType converters
 
         public static Literal From(int val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.integer), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.integer), Ontologies.Namespaces); }
 
         public static Literal From(uint val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.integer), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.integer), Ontologies.Namespaces); }
 
         public static Literal From(long val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.integer), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.integer), Ontologies.Namespaces); }
 
         public static Literal From(ulong val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.integer), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.integer), Ontologies.Namespaces); }
 
         public static Literal From(float val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.@float), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.@float), Ontologies.Namespaces); }
 
         public static Literal From(double val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.@double), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.@double), Ontologies.Namespaces); }
 
         public static Literal From(decimal val)
-            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string)Ontologies.Xsd.@decimal), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val.ToString(CultureInfo.InvariantCulture), "\"^^", (string?)Ontologies.Xsd.@decimal), Ontologies.Namespaces); }
 
         public static Literal From(bool val)
-            { return new Literal(string.Concat("\"", val ? "true" : "false", "\"^^", (string)Ontologies.Xsd.boolean), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", val ? "true" : "false", "\"^^", (string?)Ontologies.Xsd.boolean), Ontologies.Namespaces); }
 
         public static Literal From(DateTimeOffset val)
-            { return new Literal(string.Concat("\"", XmlConvert.ToString(val), "\"^^", (string)Ontologies.Xsd.dateTime), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", XmlConvert.ToString(val), "\"^^", (string?)Ontologies.Xsd.dateTime), Ontologies.Namespaces); }
 
         public static Literal From(TimeSpan val)
-            { return new Literal(string.Concat("\"", XmlConvert.ToString(val), "\"^^", (string)Ontologies.Xsd.dayTimeDuration), Ontologies.Namespaces); }
+            { return new Literal(string.Concat("\"", XmlConvert.ToString(val), "\"^^", (string?)Ontologies.Xsd.dayTimeDuration), Ontologies.Namespaces); }
 
         public static Literal From(string val)
             { return new Literal(val); }

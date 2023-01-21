@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Concurrent;
@@ -42,14 +62,14 @@ namespace Canyala.Mercury.Rdf
 
             readonly Namespaces Namespaces = new Namespaces();
 
-            readonly Stack<Resource> Subjects = new Stack<Resource>();
-            readonly Stack<Resource> Predicates = new Stack<Resource>();
-            readonly Stack<Action<Resource>> Setters = new Stack<Action<Resource>>();
-            readonly Stack<Action<Resource>> Emitters = new Stack<Action<Resource>>();
+            readonly Stack<Resource?> Subjects = new();
+            readonly Stack<Resource?> Predicates = new();
+            readonly Stack<Action<Resource?>?> Setters = new();
+            readonly Stack<Action<Resource?>?> Emitters = new();
 
-            readonly ConcurrentQueue<string[]> Triples = new ConcurrentQueue<string[]>();
+            readonly ConcurrentQueue<string[]> Triples = new();
 
-            readonly Dictionary<Blank, Blank> InternalBlanks = new Dictionary<Blank, Blank>();
+            readonly Dictionary<Blank, Blank> InternalBlanks = new();
 
             #endregion
 
@@ -102,7 +122,7 @@ namespace Canyala.Mercury.Rdf
             /// Applies object.
             /// </summary>
             internal string Object
-            { set { Emitters.Peek()(CreateTerm(value)); } }
+            { set { Emitters.Peek()!(CreateTerm(value)); } }
 
             /// <summary>
             /// Applies blank allocation for a subject.
@@ -134,7 +154,7 @@ namespace Canyala.Mercury.Rdf
                 Emitters.Pop();
                 Predicates.Pop();
                 CreateTerm = BlankCreator;
-                Setters.Pop()(Subjects.Pop());
+                Setters.Pop()!(Subjects.Pop());
             }
 
             /// <summary>
@@ -166,7 +186,7 @@ namespace Canyala.Mercury.Rdf
                     CreateTerm = NilCreator;
                 }
 
-                Setters.Pop()(blankNode);
+                Setters.Pop()!(blankNode);
             }
 
             #endregion
@@ -189,12 +209,10 @@ namespace Canyala.Mercury.Rdf
             {
                 foreach (var lines in Comments.Trim(TurtleLines).CombineLines('.'))
                 {
-                    string errMsg;
-                    if (!Parser.Apply(lines, this, out errMsg))
+                    if (!Parser.Apply(lines, this, out var errMsg))
                         throw new Exception(errMsg);
 
-                    string[] triple;
-                    while (Triples.TryDequeue(out triple))
+                    while (Triples.TryDequeue(out var triple))
                         yield return triple;
                 }
             }
@@ -203,20 +221,20 @@ namespace Canyala.Mercury.Rdf
 
             #region Setter Handlers
 
-            private void BlankNodeExceptionSetter(Resource blankNode)
+            private void BlankNodeExceptionSetter(Resource? blankNode)
             { throw new Exception("Attempt to set undefined property list or collection node."); }
 
-            private void BlankNodeIsSubjectSetter(Resource blankNode)
-            { Subject = blankNode; }
+            private void BlankNodeIsSubjectSetter(Resource? blankNode)
+            { Subject = blankNode!; }
 
-            private void BlankNodeIsObjectSetter(Resource blankNode)
-            { Object = blankNode; }
+            private void BlankNodeIsObjectSetter(Resource? blankNode)
+            { Object = blankNode!; }
 
             #endregion
 
             #region Emitter Handlers
 
-            private void EmitTriple(Resource subject, Resource predicate, Resource @object)
+            private void EmitTriple(Resource? subject, Resource? predicate, Resource? @object)
             {
                 if (subject is Blank)
                     subject = UniqueInternalBlank(subject as Blank);
@@ -227,31 +245,30 @@ namespace Canyala.Mercury.Rdf
                 if (@object is Blank)
                     @object = UniqueInternalBlank(@object as Blank);
 
-                Triples.Enqueue(Seq.Array<string>(subject, predicate, @object)); 
+                Triples.Enqueue(Seq.Array<string>(subject!, predicate!, @object!)); 
             }
 
-            private Blank UniqueInternalBlank(Blank externalBlank)
+            private Blank UniqueInternalBlank(Blank? externalBlank)
             {
-                Blank internalBlank;
-                if (!InternalBlanks.TryGetValue(externalBlank, out internalBlank))
+                if (!InternalBlanks.TryGetValue(externalBlank!, out var internalBlank))
                 {
                     internalBlank = Rdf.Blank.NewBlank();
-                    InternalBlanks.Add(externalBlank, internalBlank);
+                    InternalBlanks.Add(externalBlank!, internalBlank);
                 }
 
                 return internalBlank;
             }
 
-            private void DefaultEmitter(Resource @object)
+            private void DefaultEmitter(Resource? @object)
                 { EmitTriple(Subjects.Peek(), Predicates.Peek(), @object); }
 
-            private void FirstCollectionEmitter(Resource @object)
+            private void FirstCollectionEmitter(Resource? @object)
             {
                 EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
                 Emitters.Poke(RestCollectionEmitter);
             }
 
-            private void RestCollectionEmitter(Resource @object)
+            private void RestCollectionEmitter(Resource? @object)
             {
                 EmitTriple(Subjects.Peek(), Ontologies.Rdf.rest, Subjects.Poke(Rdf.Blank.NewBlank()));
                 EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
@@ -263,7 +280,7 @@ namespace Canyala.Mercury.Rdf
 
             #region Special Term Resolvers
 
-            Func<string, Resource> CreateTerm;
+            Func<string, Resource> CreateTerm = UndefinedTerm;
 
             internal void TermIsBoolean()
             { CreateTerm = BooleanCreator; }
@@ -294,6 +311,9 @@ namespace Canyala.Mercury.Rdf
 
             internal void TermIsA()
             { CreateTerm = ACreator; }
+
+            private static Resource UndefinedTerm(string na)
+            { throw new NotImplementedException("UndefinedTerm"); }
 
             private Resource BooleanCreator(string value)
             { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.boolean), Namespaces); }

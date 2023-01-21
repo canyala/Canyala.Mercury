@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -20,11 +40,11 @@ namespace Canyala.Mercury
     /// </summary>
     public class Uri
     {
-        public string Scheme { get; set; }
-        public string Authority { get; set; }
-        public string Path { get; set; }
-        public string Query { get; set; }
-        public string Fragment { get; set; }
+        public string Scheme { get; set; } = string.Empty;
+        public string Authority { get; set; } = string.Empty;
+        public string Path { get; set; } = string.Empty;
+        public string Query { get; set; } = string.Empty;
+        public string Fragment { get; set; } = string.Empty;
 
         public override string ToString()
         {
@@ -65,14 +85,21 @@ namespace Canyala.Mercury
             return new Uri { Authority = authority, Fragment = fragment, Path = path, Query = query, Scheme = scheme };
         }
 
-        public static Uri From(string scheme, string authority, string path, string query, string fragment)
+        public static Uri From(string? scheme, string? authority, string? path, string? query, string? fragment)
         {
-            return new Uri { Authority = authority, Fragment = fragment, Path = path, Query = query, Scheme = scheme };
+            return new Uri
+            {
+                Authority = authority ?? string.Empty,
+                Fragment = fragment ?? string.Empty,
+                Path = path ?? string.Empty,
+                Query = query ?? string.Empty,
+                Scheme = scheme ?? string.Empty
+            };
         }
 
         private static string GetScheme(string uri, out string scheme)
         {
-            scheme = null;
+            scheme = null!;
             for (int i = 0; i < uri.Length; i++)
             {
                 char c = uri[i];
@@ -89,7 +116,7 @@ namespace Canyala.Mercury
 
         private static string GetAuthority(string uri, out string authority)
         {
-            authority = null;
+            authority = null!;
 
             if (!uri.StartsWith(@"//"))
                 return uri;
@@ -128,7 +155,7 @@ namespace Canyala.Mercury
 
         private static string GetQuery(string uri, out string query)
         {
-            query = null;
+            query = null!;
 
             if (!uri.StartsWith("?"))
                 return uri;
@@ -149,7 +176,7 @@ namespace Canyala.Mercury
 
         private static string GetFragment(string uri, out string fragment)
         {
-            fragment = null;
+            fragment = null!;
 
             if (!uri.StartsWith("#"))
                 return uri;

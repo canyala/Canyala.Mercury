@@ -1,8 +1,28 @@
-﻿//
-// Copyright (c) 2012 Canyala Innovation AB
-//
-// All rights reserved.
-//
+﻿/*
+
+  MIT License
+ 
+  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+*/
 
 using System;
 using System.Collections.Generic;
@@ -30,22 +50,22 @@ namespace Canyala.Mercury.Rdf
         {
             internal Specification Plan { get; private set; }
 
-            private Stack<Term> Predicates = new Stack<Term>();
-            private Stack<Term> Subjects = new Stack<Term>();
+            private Stack<Term?> Predicates = new();
+            private Stack<Term?> Subjects = new();
 
-            private Stack<Action<Term>> Emitters = new Stack<Action<Term>>();
-            private Stack<Action<Term>> Setters = new Stack<Action<Term>>();
+            private Stack<Action<Term?>?> Emitters = new();
+            private Stack<Action<Term?>?> Setters = new();
 
             private Stack<Group> Groups { get; set; }
             private Stack<List<Group>> GroupLists { get; set; }
             private Group CurrentGroup { get { return Groups.Peek(); } }
-            private Group LastGroup { get; set; }
+            private Group? LastGroup { get; set; }
 
-            private string _currentOperation;
+            private string? _currentOperation;
             private bool _distinct;
 
             private int _currentDataIndex;
-            private string[] _currentDataBlock;
+            private string[]? _currentDataBlock;
 
             private bool _selectAll;
 
@@ -79,10 +99,12 @@ namespace Canyala.Mercury.Rdf
                 ArgCounts = new Stack<int>();
 
                 GroupConcatSeparator = "\" \"";
+
+                CreateTerm = UndefinedTerm;
             }
 
             #region Finalization
-            internal Specification FinalizedPlan
+            internal Specification ExtractFinalPlan
             {
                 get
                 {
@@ -95,9 +117,9 @@ namespace Canyala.Mercury.Rdf
 
                     FinalizeSelectAll(Plan.Groups);
 
-                    var result = Plan;
-                    Plan = null;
-                    return result;
+                    var finalPlan = Plan;
+                    Plan = Specification.Empty;
+                    return finalPlan;
                 }
             }
 
@@ -162,7 +184,7 @@ namespace Canyala.Mercury.Rdf
             /// Applies a base.
             /// </summary>
             internal Namespace Base
-                { set { Plan.Namespaces.Base = value; } }
+                { set { Plan!.Namespaces.Base = value; } }
 
             /// <summary>
             /// Applies a prefix and a namespace.
@@ -170,7 +192,7 @@ namespace Canyala.Mercury.Rdf
             /// <param name="prefix">A prefix.</param>
             /// <param name="namespace">A namespace.</param>
             internal void PrefixAndNamespace(string prefix, string @namespace)
-                { Plan.Namespaces.Add(prefix, @namespace); }
+                { Plan!.Namespaces.Add(prefix, @namespace); }
 
             internal Variable SelectVar
                 { set { CurrentVariables.Add(value); } }
@@ -205,7 +227,7 @@ namespace Canyala.Mercury.Rdf
                     var lambdaBinder = Expression.Lambda<Func<Func<string, string>, string, HashSet<string>, string>>(body, getVarParam, ignored, distinctSet);
                     var aggregateBinder = lambdaBinder.Compile();
 
-                    LastGroup.AggregateBinders.Add(aggregateBinder);
+                    LastGroup!.AggregateBinders.Add(aggregateBinder);
                     LastGroup.AggregateVars.Add(value);
                     LastGroup.AggregateDistincts.Add(false);
                     LastGroup.GroupByVars.Add(value);
@@ -222,7 +244,7 @@ namespace Canyala.Mercury.Rdf
                     var lambdaBinder = Expression.Lambda<Func<Func<string, string>, string, HashSet<string>, string>>(body, getVarParam, ignored, distinctSet);
                     var aggregateBinder = lambdaBinder.Compile();
 
-                    LastGroup.AggregateBinders.Add(aggregateBinder);
+                    LastGroup!.AggregateBinders.Add(aggregateBinder);
                     LastGroup.AggregateVars.Add(value);
                     LastGroup.AggregateDistincts.Add(false);
                     LastGroup.GroupByVars.Add(value);
@@ -232,10 +254,10 @@ namespace Canyala.Mercury.Rdf
             }
 
             internal Variable OrderByVar
-                { set { LastGroup.OrderByVars.Add(value); } }
+                { set { LastGroup!.OrderByVars.Add(value); } }
 
             internal string CurrentOperation { 
-                get { return _currentOperation; }
+                get { return _currentOperation!; }
                 set { _currentOperation = value.ToUpperInvariant(); } 
             }
 
@@ -299,14 +321,14 @@ namespace Canyala.Mercury.Rdf
                 var lambdaExpression = Expression.Lambda<Func<Func<string, string>, string>>(castToString, getVarParam);
                 var compiledExpression = lambdaExpression.Compile();
 
-                LastGroup.ExplicitBinders.Add(compiledExpression);
+                LastGroup!.ExplicitBinders.Add(compiledExpression);
 
                 if (LastGroup.ExplicitBindAsVars.Count < LastGroup.ExplicitBinders.Count)
                 {
                     Contract.Assume(LastGroup.ExplicitBindAsVars.Count + 1 == LastGroup.ExplicitBinders.Count, "Internal error: count mismatch.");
 
                     var anonVar = NewAnonymous() as Variable;
-                    LastGroup.ExplicitBindAsVars.Add(anonVar);
+                    LastGroup.ExplicitBindAsVars.Add(anonVar!);
                 }
 
                 LastGroup.GroupByVars.Add(LastGroup.ExplicitBindAsVars[LastGroup.ExplicitBindAsVars.Count-1]);
@@ -329,7 +351,7 @@ namespace Canyala.Mercury.Rdf
                 set
                 {
                     var val = string.Equals(value, "UNDEF", StringComparison.InvariantCultureIgnoreCase) ? "" : value;
-                     _currentDataBlock[_currentDataIndex++] = Resource.Parse(val, Plan.Namespaces);
+                     _currentDataBlock![_currentDataIndex++] = Resource.Parse(val, Plan.Namespaces)!;
                      if (_currentDataIndex == CurrentGroup.Variables.Count)
                         CurrentGroup.Values.Add(_currentDataBlock);
                 }
@@ -339,19 +361,19 @@ namespace Canyala.Mercury.Rdf
             /// Applies subject.
             /// </summary>
             internal string Subject
-                { set { Subjects.Poke(CreateTerm(value)); } }
+                { set { Subjects!.Poke(CreateTerm(value)); } }
 
             /// <summary>
             /// Applies predicate.
             /// </summary>
             internal string Predicate
-                { set { Predicates.Poke(CreateTerm(value)); } }
+                { set { Predicates!.Poke(CreateTerm(value)); } }
 
             /// <summary>
             /// Applies object.
             /// </summary>
             internal string Object
-                { set { Emitters.Peek()(CreateTerm(value)); } }
+                { set { Emitters.Peek()!(CreateTerm(value)); } }
 
             /// <summary>
             /// Applies blank allocation for a subject.
@@ -383,7 +405,7 @@ namespace Canyala.Mercury.Rdf
                 Emitters.Pop();
                 Predicates.Pop();
                 CreateTerm = VariableCreator;
-                Setters.Pop()(Subjects.Pop());
+                Setters.Pop()!(Subjects.Pop());
             }
 
             /// <summary>
@@ -405,32 +427,32 @@ namespace Canyala.Mercury.Rdf
                 var anonymousVar = Subjects.Pop();
 
                 if (RestCollectionEmitter == Emitters.Pop())
-                    EmitTriple(subject, Ontologies.Rdf.rest, Ontologies.Rdf.nil);
+                    EmitTriple(subject!, Ontologies.Rdf.rest, Ontologies.Rdf.nil);
                 else
                     anonymousVar = Ontologies.Rdf.nil;
 
                 CreateTerm = VariableCreator;
-                Setters.Pop()(anonymousVar);
+                Setters.Pop()!(anonymousVar);
             }
 
             #endregion
 
             #region Setter Handlers
 
-            private void AnonymousVarExceptionSetter(Term anonymousVar)
+            private void AnonymousVarExceptionSetter(Term? anonymousVar)
                 { throw new Exception("Attempt to set undefined property list or collection node."); }
 
-            private void AnonymousVarIsSubjectSetter(Term anonymousVar)
-                { Subject = anonymousVar; }
+            private void AnonymousVarIsSubjectSetter(Term? anonymousVar)
+                { Subject = anonymousVar!; }
 
-            private void AnonymousVarIsObjectSetter(Term anonymousVar)
-                { Object = anonymousVar; }
+            private void AnonymousVarIsObjectSetter(Term? anonymousVar)
+                { Object = anonymousVar!; }
 
             #endregion
 
             #region Emitter Handlers
 
-            private void EmitTriple(Term subject, Term predicate, Term @object)
+            private void EmitTriple(Term? subject, Term? predicate, Term? @object)
             {
                 if (CurrentGroup.ExplicitBindAsVars.Count > 0)
                 {
@@ -441,16 +463,16 @@ namespace Canyala.Mercury.Rdf
                 CurrentGroup.Clauses.Add(Seq.Array(subject, predicate, @object)); 
             }
 
-            private void DefaultEmitter(Term @object)
+            private void DefaultEmitter(Term? @object)
                 { EmitTriple(Subjects.Peek(), Predicates.Peek(), @object); }
 
-            private void FirstCollectionEmitter(Term @object)
+            private void FirstCollectionEmitter(Term? @object)
             {
                 EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
                 Emitters.Poke(RestCollectionEmitter);
             }
 
-            private void RestCollectionEmitter(Term @object)
+            private void RestCollectionEmitter(Term? @object)
             {
                 EmitTriple(Subjects.Peek(), Ontologies.Rdf.rest, Subjects.Poke(NewAnonymous()));
                 EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
@@ -460,7 +482,7 @@ namespace Canyala.Mercury.Rdf
 
             #region Special Term Resolvers
 
-            Func<string, Term> CreateTerm;
+            Func<string, Term?> CreateTerm;
 
             internal void TermIsBoolean()
                 { CreateTerm = BooleanCreator; }
@@ -495,6 +517,9 @@ namespace Canyala.Mercury.Rdf
             internal void TermIsA()
                 { CreateTerm = ACreator; }
 
+            private Term UndefinedTerm(string value)
+                { throw new NotImplementedException(nameof(UndefinedTerm)); }
+
             private Term BooleanCreator(string value)
                 { return new Literal(value, Ontologies.Xsd.boolean); }
 
@@ -514,7 +539,7 @@ namespace Canyala.Mercury.Rdf
                 { return new Variable(value); }
 
             private Term IriCreator(string value)
-                { return new Iri(value, Plan.Namespaces); }
+                { return new Iri(value, Plan!.Namespaces); }
 
             private Term BlankCreator(string value)
                 { return new Blank(value); }
@@ -526,7 +551,7 @@ namespace Canyala.Mercury.Rdf
                 { return Ontologies.Rdf.nil; }
 
             private Term StringCreator(string value)
-                { return new Literal(value, Plan.Namespaces); }
+                { return new Literal(value, Plan!.Namespaces); }
 
             private Term ACreator(string value)
                 { return Ontologies.Rdf.type; }
@@ -542,12 +567,12 @@ namespace Canyala.Mercury.Rdf
 
             internal void OrderByAsc()
             {
-                LastGroup.OrderByDescends.Add(false);
+                LastGroup!.OrderByDescends.Add(false);
             }
 
             internal void OrderByDesc()
             {
-                LastGroup.OrderByDescends.Add(true);
+                LastGroup!.OrderByDescends.Add(true);
             }
 
             internal void OrderByBind()
@@ -559,9 +584,9 @@ namespace Canyala.Mercury.Rdf
 
                 var anonVar = NewAnonymous() as Variable;
 
-                LastGroup.OrderByVars.Add(anonVar);
-                LastGroup.ImplicitBinders.Add(compiledExpression);
-                LastGroup.ImplicitBindAsVars.Add(anonVar);
+                LastGroup!.OrderByVars.Add(anonVar!);
+                LastGroup!.ImplicitBinders.Add(compiledExpression);
+                LastGroup!.ImplicitBindAsVars.Add(anonVar!);
             }
 
             #endregion
@@ -569,10 +594,10 @@ namespace Canyala.Mercury.Rdf
             #region Limit & Offset
 
             internal string Limit
-                { set { LastGroup.Limit = int.Parse(value); } }
+                { set { LastGroup!.Limit = int.Parse(value); } }
 
             internal string Offset
-                { set { LastGroup.Offset = int.Parse(value); } }
+                { set { LastGroup!.Offset = int.Parse(value); } }
 
             #endregion
 
@@ -603,22 +628,22 @@ namespace Canyala.Mercury.Rdf
                 var lambdaExpression = Expression.Lambda<Func<Func<string, string>, bool>>(asBool, getVarParam);
                 var compiledExpression = lambdaExpression.Compile();
 
-                LastGroup.AggregateVars.AddRange(CurrentAggregateVariables);
+                LastGroup!.AggregateVars.AddRange(CurrentAggregateVariables);
                 CurrentAggregateVariables.Clear();
 
-                LastGroup.AggregateBinders.AddRange(CurrentAggregateBinders);
+                LastGroup!.AggregateBinders.AddRange(CurrentAggregateBinders);
                 CurrentAggregateBinders.Clear();
 
-                LastGroup.ImplicitBindAsVars.AddRange(CurrentImplicitBindVariables);
+                LastGroup!.ImplicitBindAsVars.AddRange(CurrentImplicitBindVariables);
                 CurrentImplicitBindVariables.Clear();
 
-                LastGroup.ImplicitBinders.AddRange(CurrentImplicitBindBinders);
+                LastGroup!.ImplicitBinders.AddRange(CurrentImplicitBindBinders);
                 CurrentImplicitBindBinders.Clear();
 
-                LastGroup.AggregateDistincts.AddRange(CurrentAggregateDistincts);
+                LastGroup!.AggregateDistincts.AddRange(CurrentAggregateDistincts);
                 CurrentAggregateDistincts.Clear();
 
-                LastGroup.Filters.Add(compiledExpression);
+                LastGroup!.Filters.Add(compiledExpression);
             }
 
             internal void Bind()
@@ -643,7 +668,7 @@ namespace Canyala.Mercury.Rdf
 
             internal void SymbolExpression(string value) 
             {
-                Expression expr = null;
+                Expression? expr = null;
 
                 if (CreateTerm == VariableCreator)
                 {
@@ -1160,9 +1185,9 @@ namespace Canyala.Mercury.Rdf
 
                 var anonVar = NewAnonymous() as Variable;
                 CurrentImplicitBindBinders.Add(compiledExpression);
-                CurrentImplicitBindVariables.Add(anonVar);
+                CurrentImplicitBindVariables.Add(anonVar!);
 
-                var name = anonVar.Value;
+                var name = anonVar!.Value;
 
                 var value = Expression.Invoke(getVarParam, Expression.Constant(name));
                 var resValue = Expression.Call(typeof(Resource), "Parse", null, value);
@@ -1189,9 +1214,9 @@ namespace Canyala.Mercury.Rdf
                 var aggregateVar = NewAnonymous() as Variable;
 
                 CurrentAggregateBinders.Add(aggregateBinder);
-                CurrentAggregateVariables.Add(aggregateVar);
+                CurrentAggregateVariables.Add(aggregateVar!);
 
-                var varReturn = Expression.Invoke(getVarParam, Expression.Constant(aggregateVar.Value));
+                var varReturn = Expression.Invoke(getVarParam, Expression.Constant(aggregateVar!.Value));
                 var resReturn = Expression.Call(typeof(Resource), "Parse", null, varReturn);
 
                 Expressions.Push(resReturn);
@@ -1240,9 +1265,9 @@ namespace Canyala.Mercury.Rdf
                 var aggregateVar = NewAnonymous() as Variable;
 
                 CurrentAggregateBinders.Add(aggregateBinder);
-                CurrentAggregateVariables.Add(aggregateVar);
+                CurrentAggregateVariables.Add(aggregateVar!);
 
-                var varReturn = Expression.Invoke(getVarParam, Expression.Constant(aggregateVar.Value));
+                var varReturn = Expression.Invoke(getVarParam, Expression.Constant(aggregateVar!.Value));
                 var resReturn = Expression.Call(typeof(Resource), "Parse", null, varReturn);
 
                 Expressions.Push(resReturn);
