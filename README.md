@@ -13,7 +13,7 @@ The Canyala.Mercury .NET Base Class Libraries
 
 
 ## Build preparations
-Run the commandf below in the solution repository.
+Run the command below in the solution repository.
 
 $ git submodule update --init --recursive
 
