@@ -35,7 +35,7 @@ using Canyala.Lagoon.Functional;
 using Canyala.Lagoon.Serialization;
 using Canyala.Lagoon.Text;
 
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
 using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;

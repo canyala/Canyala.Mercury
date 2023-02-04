@@ -33,57 +33,55 @@ using System.Threading.Tasks;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
-namespace Canyala.Mercury.Rdf
+namespace Canyala.Mercury.Rdf;
+
+/// <summary>
+/// Provides a representation for RDF/SPARQL query variables
+/// </summary>
+public class Variable : Term
 {
-    /// <summary>
-    /// Provides a representation for RDF/SPARQL query variables
-    /// </summary>
-    public class Variable : Term
+    private string _name;
+
+    internal Variable(string name)
+        { _name = name; }
+
+    public override bool Equals(object? obj)
     {
-        private string _name;
+        if (object.ReferenceEquals(this, obj))
+            return true;
 
-        internal Variable(string name)
-            { _name = name; }
+        if (obj is Variable otherVar && _name == otherVar._name)
+            return true;
 
-        public override bool Equals(object? obj)
-        {
-            if (object.ReferenceEquals(this, obj))
-                return true;
-
-            if (obj is Variable otherVar && _name == otherVar._name)
-                return true;
-
-            return false;
-        }
-
-        public bool IsAnonymous
-            { get { return _name.StartsWith("_:var"); } }
-
-        public string Full
-        { 
-            get 
-            { 
-                if (IsAnonymous)
-                    return _name;
-
-                return string.Concat("?", _name); 
-            } 
-        }
-
-        public string Value
-            { get { return _name; } }
-
-        public override int GetHashCode()
-            { return _name.GetHashCode(); }
-
-        public override string ToString()
-            { return Full; }
-
-        public static implicit operator Variable(string value)
-            { return new Variable(value); }
-
-        public static Variable NewAnonymous(long val)
-            { return new Variable("_:var{0}".Args(val)); }
+        return false;
     }
+
+    public bool IsAnonymous
+        { get { return _name.StartsWith("_:var"); } }
+
+    public string Full
+    { 
+        get 
+        { 
+            if (IsAnonymous)
+                return _name;
+
+            return string.Concat("?", _name); 
+        } 
+    }
+
+    public string Value
+        { get { return _name; } }
+
+    public override int GetHashCode()
+        { return _name.GetHashCode(); }
+
+    public override string ToString()
+        { return Full; }
+
+    public static implicit operator Variable(string value)
+        { return new Variable(value); }
+
+    public static Variable NewAnonymous(long val)
+        { return new Variable("_:var{0}".Args(val)); }
 }
-    

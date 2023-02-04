@@ -38,12 +38,12 @@ using Canyala.Mercury.Storage;
 using Canyala.Mercury.Storage.Collections;
 using Canyala.Mercury.Storage.Extensions;
 
-using Canyala.Mercury.Extensions;
+using Canyala.Mercury.Core.Extensions;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleToAttribute("Canyala.Mercury.Test")]
 
-namespace Canyala.Mercury.Internal;
+namespace Canyala.Mercury.Core.Internal;
 
 /// <summary>
 /// Provides an index implementation using environment heap based dictionaries and sets.

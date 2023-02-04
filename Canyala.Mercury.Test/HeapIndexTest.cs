@@ -30,25 +30,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Canyala.Mercury.Internal;
+using Canyala.Mercury.Core.Internal;
 using Canyala.Mercury.Storage;
 
-namespace Canyala.Mercury.Test
-{
-    [TestClass]
-    public class HeapIndexTest
-    {
-        [TestMethod]
-        public void AddAndRemove()
-        {
-            var environment = Storage.Environment.Create();
-            var index = new HeapIndex(environment);
+namespace Canyala.Mercury.Test;
 
-            index.Add("a", "b", "c");
-            index.Add("a", "bc", "c");
-            index.Remove("a", null, "c");
-            index.Add("a", "bc", "c");
-            index.Add("a", "b", "c");
-        }
+[TestClass]
+public class HeapIndexTest
+{
+    [TestMethod]
+    public void AddAndRemove()
+    {
+        var environment = Storage.Environment.Create();
+        var index = new HeapIndex(environment);
+
+        index.Add("a", "b", "c");
+        index.Add("a", "bc", "c");
+        index.Remove("a", null, "c");
+        index.Add("a", "bc", "c");
+        index.Add("a", "b", "c");
     }
 }

@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 /// <summary>
 /// Provides a table abstraction for string array sequences.

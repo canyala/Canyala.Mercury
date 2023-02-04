@@ -31,9 +31,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Canyala.Mercury.Storage.Collections;
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
 
-namespace Canyala.Mercury.Extensions;
+namespace Canyala.Mercury.Core.Extensions;
 
 public static class ConstraintExtensions
 {

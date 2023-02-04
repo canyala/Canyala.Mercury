@@ -31,33 +31,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Canyala.Mercury.Storage.Strategies.Internal
+namespace Canyala.Mercury.Storage.Strategies.Internal;
+
+/// <summary>
+/// Implements a single store in memory heap factory closure.
+/// </summary>
+internal class SinglestoreInMemory : Strategy
 {
-    /// <summary>
-    /// Implements a single store in memory heap factory closure.
-    /// </summary>
-    internal class SinglestoreInMemory : Strategy
+    public SinglestoreInMemory(int heapSize)
     {
-        public SinglestoreInMemory(int heapSize)
-        {
-            HeapFactory = HeapFactoryClosure;
-            HeapSize = heapSize;
-        }
+        HeapFactory = HeapFactoryClosure;
+        HeapSize = heapSize;
+    }
 
-        private Heap? _singleHeap;
+    private Heap? _singleHeap;
 
-        public int HeapSize { get; set; }
+    public int HeapSize { get; set; }
 
-        public Heap HeapFactoryClosure(Type type)
-        {
-            _singleHeap ??= new Heap(new MemoryStream(), HeapSize);
+    public Heap HeapFactoryClosure(Type type)
+    {
+        _singleHeap ??= new Heap(new MemoryStream(), HeapSize);
 
-            return _singleHeap;
-        }
+        return _singleHeap;
+    }
 
-        public override void Remove()
-        {
-            _singleHeap = null;
-        }
+    public override void Remove()
+    {
+        _singleHeap = null;
     }
 }

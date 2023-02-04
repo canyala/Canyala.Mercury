@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 using Canyala.Lagoon.Extensions;
 
-namespace Canyala.Mercury.Extensions;
+namespace Canyala.Mercury.Core.Extensions;
 
 public static class UriStringExtensions
 {

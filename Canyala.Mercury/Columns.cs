@@ -30,7 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 public class Columns : IDictionary<string,int>
 {

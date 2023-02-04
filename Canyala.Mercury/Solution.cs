@@ -32,10 +32,10 @@ using System.Threading.Tasks;
 
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
-using Canyala.Mercury.Extensions;
+using Canyala.Mercury.Core.Extensions;
 using Canyala.Mercury.Storage.Collections;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 /// <summary>
 /// Provides a solution for graph enumerations.

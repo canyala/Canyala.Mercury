@@ -31,7 +31,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 

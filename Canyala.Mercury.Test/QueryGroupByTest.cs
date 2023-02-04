@@ -31,7 +31,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
 using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;

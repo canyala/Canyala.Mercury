@@ -31,26 +31,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Canyala.Mercury.Storage.Strategies.Internal
+namespace Canyala.Mercury.Storage.Strategies.Internal;
+
+/// <summary>
+/// Implements a poly store in memory heap factory closure.
+/// </summary>
+internal class PolystoreInMemory : Strategy
 {
-    /// <summary>
-    /// Implements a poly store in memory heap factory closure.
-    /// </summary>
-    internal class PolystoreInMemory : Strategy
+    public int HeapSize { get; set; }
+
+    public PolystoreInMemory(int heapSize)
     {
-        public int HeapSize { get; set; }
+        HeapSize = heapSize;
+        HeapFactory = HeapFactoryClosure;
+    }
 
-        public PolystoreInMemory(int heapSize)
-        {
-            HeapSize = heapSize;
-            HeapFactory = HeapFactoryClosure;
-        }
+    private Heap HeapFactoryClosure(Type type)
+        { return new Heap(new MemoryStream(), HeapSize); }
 
-        private Heap HeapFactoryClosure(Type type)
-            { return new Heap(new MemoryStream(), HeapSize); }
-
-        public override void Remove()
-        {
-        }
+    public override void Remove()
+    {
     }
 }
