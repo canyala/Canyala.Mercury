@@ -26,42 +26,41 @@
 
 using System;
 
-namespace Canyala.Mercury
+namespace Canyala.Mercury.Core;
+
+/// <summary>
+/// Provides a namespace representation
+/// </summary>
+public class Namespace
 {
+    private string _iri;
+
     /// <summary>
-    /// Provides a namespace representation
+    /// Creates a namespace
     /// </summary>
-    public class Namespace
-    {
-        private string _iri;
+    /// <param name="iri"></param>
+    private Namespace(string iri)
+        { _iri = iri; }
 
-        /// <summary>
-        /// Creates a namespace
-        /// </summary>
-        /// <param name="iri"></param>
-        private Namespace(string iri)
-            { _iri = iri; }
+    public string this[string @class]
+        { get { return String.Concat("<",_iri, @class,">"); } }
 
-        public string this[string @class]
-            { get { return String.Concat("<",_iri, @class,">"); } }
+    public string IriRef
+        { get { return String.Concat("<", _iri, ">"); } }
 
-        public string IriRef
-            { get { return String.Concat("<", _iri, ">"); } }
+    public string Iri(string @class)
+        { return string.Concat(_iri, @class); }
 
-        public string Iri(string @class)
-            { return string.Concat(_iri, @class); }
+    public static Namespace FromUri(string uri)
+        { return new Namespace(uri); }
 
-        public static Namespace FromUri(string uri)
-            { return new Namespace(uri); }
+    public static implicit operator string(Namespace ns)
+        { return ns.ToString(); }
 
-        public static implicit operator string(Namespace ns)
-            { return ns.ToString(); }
+    public static implicit operator Namespace(string ns)
+        { return Namespace.FromUri(ns.Trim('<', '>')); }
 
-        public static implicit operator Namespace(string ns)
-            { return Namespace.FromUri(ns.Trim('<', '>')); }
-
-        public override string ToString()
-            { return _iri; }
-    }
+    public override string ToString()
+        { return _iri; }
 }
 

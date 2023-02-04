@@ -36,7 +36,7 @@ using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 using Canyala.Lagoon.Contracts;
 
-namespace Canyala.Mercury.Text;
+namespace Canyala.Mercury.Core.Text;
 
 /// <summary>
 /// Provides a BNF style parser with grammar and production API's for a deriving parser implementation.

@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 using Canyala.Mercury.Storage.Collections;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 /// <summary>
 /// Provides a domain model for IOrderedCollection constraints.
@@ -270,9 +270,9 @@ public abstract class Constraint
 
     private sealed class View : Constraint
     {
-        private Mercury.View _view;
+        private Core.View _view;
 
-        internal View(Mercury.View view)
+        internal View(Core.View view)
             { _view = view; }
 
         public override IEnumerable<T> Enumerate<T>(IOrderedCollection<string, T> collection)
@@ -381,7 +381,7 @@ public abstract class Constraint
     /// </summary>
     /// <param name="view">A solution view.</param>
     /// <returns>A view constraint or an empty constraint.</returns>
-    public static implicit operator Constraint(Mercury.View view)
+    public static implicit operator Constraint(Mercury.Core.View view)
         { return view == null ? (Constraint)new Null() : (Constraint)new View(view); }
 
     /// <summary>

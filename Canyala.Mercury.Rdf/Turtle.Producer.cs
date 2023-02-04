@@ -35,327 +35,327 @@ using System.Threading.Tasks;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
+using Canyala.Mercury.Core;
 using Canyala.Mercury.Rdf.Internal;
 using Canyala.Mercury.Rdf.Extensions;
 
-namespace Canyala.Mercury.Rdf
+namespace Canyala.Mercury.Rdf;
+
+/// <summary>
+/// Provides an API for terse turtle documents.
+/// </summary>
+/// <remarks>
+/// Terse RDF Triple Language
+/// W3C Candidate Recommendation 19 February 2013
+/// </remarks>
+/// <seealso cref="http://www.w3.org/TR/2013/CR-turtle-20130219/"/>
+public partial class Turtle
 {
     /// <summary>
-    /// Provides an API for terse turtle documents.
+    /// Provides a turtle producer.
     /// </summary>
-    /// <remarks>
-    /// Terse RDF Triple Language
-    /// W3C Candidate Recommendation 19 February 2013
-    /// </remarks>
-    /// <seealso cref="http://www.w3.org/TR/2013/CR-turtle-20130219/"/>
-    public partial class Turtle
+    public class Producer : IEnumerable<string[]>, IDisposable
     {
+        #region State
+
+        readonly Turtle Parser;
+        readonly IEnumerable<string> TurtleLines;
+
+        readonly Namespaces Namespaces = new Namespaces();
+
+        readonly Stack<Resource?> Subjects = new();
+        readonly Stack<Resource?> Predicates = new();
+        readonly Stack<Action<Resource?>?> Setters = new();
+        readonly Stack<Action<Resource?>?> Emitters = new();
+
+        readonly ConcurrentQueue<string[]> Triples = new();
+
+        readonly Dictionary<Blank, Blank> InternalBlanks = new();
+
+        #endregion
+
+        #region Construction
+
         /// <summary>
-        /// Provides a turtle producer.
+        /// Create a turtle producer.
         /// </summary>
-        public class Producer : IEnumerable<string[]>, IDisposable
+        /// <param name="parser">The turtle parse instance.</param>
+        /// <param name="turtleLines">A turtle document as a sequence of text line strings.</param>
+        internal Producer(Turtle parser, IEnumerable<string> turtleLines)
         {
-            #region State
+            Emitters.Push(DefaultEmitter);
+            Setters.Push(BlankNodeExceptionSetter);
+            TurtleLines = turtleLines;
+            Parser = parser;
+        }
 
-            readonly Turtle Parser;
-            readonly IEnumerable<string> TurtleLines;
+        #endregion
 
-            readonly Namespaces Namespaces = new Namespaces();
+        #region Production Rule State Appliers
 
-            readonly Stack<Resource?> Subjects = new();
-            readonly Stack<Resource?> Predicates = new();
-            readonly Stack<Action<Resource?>?> Setters = new();
-            readonly Stack<Action<Resource?>?> Emitters = new();
+        /// <summary>
+        /// Applies a base.
+        /// </summary>
+        internal Namespace Base
+        { set { Namespaces.Base = value; } }
 
-            readonly ConcurrentQueue<string[]> Triples = new();
+        /// <summary>
+        /// Applies prefix and namespace.
+        /// </summary>
+        /// <param name="prefix"></param>
+        /// <param name="namespace"></param>
+        internal void PrefixAndNamespace(string prefix, string @namespace)
+        { Namespaces.Add(prefix, @namespace); }
 
-            readonly Dictionary<Blank, Blank> InternalBlanks = new();
+        /// <summary>
+        /// Applies subject.
+        /// </summary>
+        internal string Subject
+        { set { Subjects.Poke(CreateTerm(value)); } }
 
-            #endregion
+        /// <summary>
+        /// Applies predicate.
+        /// </summary>
+        internal string Predicate
+        { set { Predicates.Poke(CreateTerm(value)); } }
 
-            #region Construction
+        /// <summary>
+        /// Applies object.
+        /// </summary>
+        internal string Object
+        { set { Emitters.Peek()!(CreateTerm(value)); } }
 
-            /// <summary>
-            /// Create a turtle producer.
-            /// </summary>
-            /// <param name="parser">The turtle parse instance.</param>
-            /// <param name="turtleLines">A turtle document as a sequence of text line strings.</param>
-            internal Producer(Turtle parser, IEnumerable<string> turtleLines)
+        /// <summary>
+        /// Applies blank allocation for a subject.
+        /// </summary>
+        internal void AllocBlankSubject()
+        { Setters.Push(BlankNodeIsSubjectSetter); }
+
+        /// <summary>
+        /// Applies blank allocation for an object.
+        /// </summary>
+        internal void AllocBlankObject()
+        { Setters.Push(BlankNodeIsObjectSetter); }
+
+        /// <summary>
+        /// Applies the beginning of a property object list.
+        /// </summary>
+        internal void BeginPropertyList()
+        {
+            Emitters.Push(DefaultEmitter);
+            Subjects.Push(Rdf.Blank.NewBlank());
+            Predicates.Push(null);
+        }
+
+        /// <summary>
+        /// Applies the end of a property object list.
+        /// </summary>
+        internal void EndPropertyList()
+        {
+            Emitters.Pop();
+            Predicates.Pop();
+            CreateTerm = BlankCreator;
+            Setters.Pop()!(Subjects.Pop());
+        }
+
+        /// <summary>
+        /// Applies the beginning of an object list.
+        /// </summary>
+        internal void BeginCollection()
+        {
+            Emitters.Push(FirstCollectionEmitter);
+            Subjects.Push(Rdf.Blank.NewBlank());
+            Subjects.Push(Subjects.Peek());
+        }
+
+        /// <summary>
+        /// Applies the end of an object list.
+        /// </summary>
+        internal void EndCollection()
+        {
+            var subject = Subjects.Pop();
+            var blankNode = Subjects.Pop();
+
+            if (RestCollectionEmitter == Emitters.Pop())
             {
-                Emitters.Push(DefaultEmitter);
-                Setters.Push(BlankNodeExceptionSetter);
-                TurtleLines = turtleLines;
-                Parser = parser;
-            }
-
-            #endregion
-
-            #region Production Rule State Appliers
-
-            /// <summary>
-            /// Applies a base.
-            /// </summary>
-            internal Namespace Base
-            { set { Namespaces.Base = value; } }
-
-            /// <summary>
-            /// Applies prefix and namespace.
-            /// </summary>
-            /// <param name="prefix"></param>
-            /// <param name="namespace"></param>
-            internal void PrefixAndNamespace(string prefix, string @namespace)
-            { Namespaces.Add(prefix, @namespace); }
-
-            /// <summary>
-            /// Applies subject.
-            /// </summary>
-            internal string Subject
-            { set { Subjects.Poke(CreateTerm(value)); } }
-
-            /// <summary>
-            /// Applies predicate.
-            /// </summary>
-            internal string Predicate
-            { set { Predicates.Poke(CreateTerm(value)); } }
-
-            /// <summary>
-            /// Applies object.
-            /// </summary>
-            internal string Object
-            { set { Emitters.Peek()!(CreateTerm(value)); } }
-
-            /// <summary>
-            /// Applies blank allocation for a subject.
-            /// </summary>
-            internal void AllocBlankSubject()
-            { Setters.Push(BlankNodeIsSubjectSetter); }
-
-            /// <summary>
-            /// Applies blank allocation for an object.
-            /// </summary>
-            internal void AllocBlankObject()
-            { Setters.Push(BlankNodeIsObjectSetter); }
-
-            /// <summary>
-            /// Applies the beginning of a property object list.
-            /// </summary>
-            internal void BeginPropertyList()
-            {
-                Emitters.Push(DefaultEmitter);
-                Subjects.Push(Rdf.Blank.NewBlank());
-                Predicates.Push(null);
-            }
-
-            /// <summary>
-            /// Applies the end of a property object list.
-            /// </summary>
-            internal void EndPropertyList()
-            {
-                Emitters.Pop();
-                Predicates.Pop();
+                EmitTriple(subject, Ontologies.Rdf.rest, Ontologies.Rdf.nil);
                 CreateTerm = BlankCreator;
-                Setters.Pop()!(Subjects.Pop());
             }
-
-            /// <summary>
-            /// Applies the beginning of an object list.
-            /// </summary>
-            internal void BeginCollection()
+            else
             {
-                Emitters.Push(FirstCollectionEmitter);
-                Subjects.Push(Rdf.Blank.NewBlank());
-                Subjects.Push(Subjects.Peek());
+                blankNode = Ontologies.Rdf.nil;
+                CreateTerm = NilCreator;
             }
 
-            /// <summary>
-            /// Applies the end of an object list.
-            /// </summary>
-            internal void EndCollection()
+            Setters.Pop()!(blankNode);
+        }
+
+        #endregion
+
+        #region Enumeration implementation
+
+        /// <summary>
+        /// Specific IEnumerable implementation for enumeration.
+        /// </summary>
+        /// <returns>An IEnumerator.</returns>
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        { return GetEnumerator(); }
+
+        /// <summary>
+        /// Enumerates the triples of the turtle document.
+        /// </summary>
+        /// <returns></returns>
+
+        public IEnumerator<string[]> GetEnumerator()
+        {
+            foreach (var lines in Comments.Trim(TurtleLines).CombineLines('.'))
             {
-                var subject = Subjects.Pop();
-                var blankNode = Subjects.Pop();
+                if (!Parser.Apply(lines, this, out var errMsg))
+                    throw new Exception(errMsg);
 
-                if (RestCollectionEmitter == Emitters.Pop())
-                {
-                    EmitTriple(subject, Ontologies.Rdf.rest, Ontologies.Rdf.nil);
-                    CreateTerm = BlankCreator;
-                }
-                else
-                {
-                    blankNode = Ontologies.Rdf.nil;
-                    CreateTerm = NilCreator;
-                }
-
-                Setters.Pop()!(blankNode);
+                while (Triples.TryDequeue(out var triple))
+                    yield return triple;
             }
+        }
 
-            #endregion
+        #endregion
 
-            #region Enumeration implementation
+        #region Setter Handlers
 
-            /// <summary>
-            /// Specific IEnumerable implementation for enumeration.
-            /// </summary>
-            /// <returns>An IEnumerator.</returns>
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            { return GetEnumerator(); }
+        private void BlankNodeExceptionSetter(Resource? blankNode)
+        { throw new Exception("Attempt to set undefined property list or collection node."); }
 
-            /// <summary>
-            /// Enumerates the triples of the turtle document.
-            /// </summary>
-            /// <returns></returns>
+        private void BlankNodeIsSubjectSetter(Resource? blankNode)
+        { Subject = blankNode!; }
 
-            public IEnumerator<string[]> GetEnumerator()
+        private void BlankNodeIsObjectSetter(Resource? blankNode)
+        { Object = blankNode!; }
+
+        #endregion
+
+        #region Emitter Handlers
+
+        private void EmitTriple(Resource? subject, Resource? predicate, Resource? @object)
+        {
+            if (subject is Blank)
+                subject = UniqueInternalBlank(subject as Blank);
+
+            if (predicate is Blank)
+                predicate = UniqueInternalBlank(predicate as Blank);
+
+            if (@object is Blank)
+                @object = UniqueInternalBlank(@object as Blank);
+
+            Triples.Enqueue(Seq.Array<string>(subject!, predicate!, @object!)); 
+        }
+
+        private Blank UniqueInternalBlank(Blank? externalBlank)
+        {
+            if (!InternalBlanks.TryGetValue(externalBlank!, out var internalBlank))
             {
-                foreach (var lines in Comments.Trim(TurtleLines).CombineLines('.'))
-                {
-                    if (!Parser.Apply(lines, this, out var errMsg))
-                        throw new Exception(errMsg);
-
-                    while (Triples.TryDequeue(out var triple))
-                        yield return triple;
-                }
+                internalBlank = Rdf.Blank.NewBlank();
+                InternalBlanks.Add(externalBlank!, internalBlank);
             }
 
-            #endregion
+            return internalBlank;
+        }
 
-            #region Setter Handlers
+        private void DefaultEmitter(Resource? @object)
+            { EmitTriple(Subjects.Peek(), Predicates.Peek(), @object); }
 
-            private void BlankNodeExceptionSetter(Resource? blankNode)
-            { throw new Exception("Attempt to set undefined property list or collection node."); }
+        private void FirstCollectionEmitter(Resource? @object)
+        {
+            EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
+            Emitters.Poke(RestCollectionEmitter);
+        }
 
-            private void BlankNodeIsSubjectSetter(Resource? blankNode)
-            { Subject = blankNode!; }
+        private void RestCollectionEmitter(Resource? @object)
+        {
+            EmitTriple(Subjects.Peek(), Ontologies.Rdf.rest, Subjects.Poke(Rdf.Blank.NewBlank()));
+            EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
+        }
 
-            private void BlankNodeIsObjectSetter(Resource? blankNode)
-            { Object = blankNode!; }
+        #endregion
 
-            #endregion
+        #region Special Term Resolvers
 
-            #region Emitter Handlers
+        #region Special Term Resolvers
 
-            private void EmitTriple(Resource? subject, Resource? predicate, Resource? @object)
-            {
-                if (subject is Blank)
-                    subject = UniqueInternalBlank(subject as Blank);
+        Func<string, Resource> CreateTerm = UndefinedTerm;
 
-                if (predicate is Blank)
-                    predicate = UniqueInternalBlank(predicate as Blank);
+        internal void TermIsBoolean()
+        { CreateTerm = BooleanCreator; }
 
-                if (@object is Blank)
-                    @object = UniqueInternalBlank(@object as Blank);
+        internal void TermIsInteger()
+        { CreateTerm = IntegerCreator; }
 
-                Triples.Enqueue(Seq.Array<string>(subject!, predicate!, @object!)); 
-            }
+        internal void TermIsDouble()
+        { CreateTerm = DoubleCreator; }
 
-            private Blank UniqueInternalBlank(Blank? externalBlank)
-            {
-                if (!InternalBlanks.TryGetValue(externalBlank!, out var internalBlank))
-                {
-                    internalBlank = Rdf.Blank.NewBlank();
-                    InternalBlanks.Add(externalBlank!, internalBlank);
-                }
+        internal void TermIsDecimal()
+        { CreateTerm = DecimalCreator; }
 
-                return internalBlank;
-            }
+        internal void TermIsIri()
+        { CreateTerm = IriCreator; }
 
-            private void DefaultEmitter(Resource? @object)
-                { EmitTriple(Subjects.Peek(), Predicates.Peek(), @object); }
+        internal void TermIsBlank()
+        { CreateTerm = BlankCreator; }
 
-            private void FirstCollectionEmitter(Resource? @object)
-            {
-                EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
-                Emitters.Poke(RestCollectionEmitter);
-            }
+        internal void TermIsAnon()
+        { CreateTerm = AnonCreator; }
 
-            private void RestCollectionEmitter(Resource? @object)
-            {
-                EmitTriple(Subjects.Peek(), Ontologies.Rdf.rest, Subjects.Poke(Rdf.Blank.NewBlank()));
-                EmitTriple(Subjects.Peek(), Ontologies.Rdf.first, @object);
-            }
+        internal void TermIsNil()
+        { CreateTerm = NilCreator; }
 
-            #endregion
+        internal void TermIsString()
+        { CreateTerm = StringCreator; }
 
-            #region Special Term Resolvers
+        internal void TermIsA()
+        { CreateTerm = ACreator; }
 
-            #region Special Term Resolvers
+        private static Resource UndefinedTerm(string na)
+        { throw new NotImplementedException("UndefinedTerm"); }
 
-            Func<string, Resource> CreateTerm = UndefinedTerm;
+        private Resource BooleanCreator(string value)
+        { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.boolean), Namespaces); }
 
-            internal void TermIsBoolean()
-            { CreateTerm = BooleanCreator; }
+        private Resource IntegerCreator(string value)
+        { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.integer), Namespaces); }
 
-            internal void TermIsInteger()
-            { CreateTerm = IntegerCreator; }
+        private Resource DoubleCreator(string value)
+        { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.@double), Namespaces); }
 
-            internal void TermIsDouble()
-            { CreateTerm = DoubleCreator; }
+        private Resource DecimalCreator(string value)
+        { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.@decimal), Namespaces); }
 
-            internal void TermIsDecimal()
-            { CreateTerm = DecimalCreator; }
+        private Resource IriCreator(string value)
+        { return new Iri(value, Namespaces); }
 
-            internal void TermIsIri()
-            { CreateTerm = IriCreator; }
+        private Resource BlankCreator(string value)
+        { return new Blank(value); }
 
-            internal void TermIsBlank()
-            { CreateTerm = BlankCreator; }
+        private Resource AnonCreator(string value)
+        { return NewBlank(); }
 
-            internal void TermIsAnon()
-            { CreateTerm = AnonCreator; }
+        private Resource NilCreator(string value)
+        { return Ontologies.Rdf.nil; }
 
-            internal void TermIsNil()
-            { CreateTerm = NilCreator; }
+        private Resource StringCreator(string value)
+        { return new Literal(value, Namespaces); }
 
-            internal void TermIsString()
-            { CreateTerm = StringCreator; }
+        private Resource ACreator(string value)
+        { return Ontologies.Rdf.type; }
 
-            internal void TermIsA()
-            { CreateTerm = ACreator; }
+        private Resource NewBlank()
+        { return Rdf.Blank.NewBlank(); }
 
-            private static Resource UndefinedTerm(string na)
-            { throw new NotImplementedException("UndefinedTerm"); }
+        #endregion
 
-            private Resource BooleanCreator(string value)
-            { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.boolean), Namespaces); }
+        #endregion
 
-            private Resource IntegerCreator(string value)
-            { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.integer), Namespaces); }
-
-            private Resource DoubleCreator(string value)
-            { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.@double), Namespaces); }
-
-            private Resource DecimalCreator(string value)
-            { return new Literal("\"{0}\"^^{1}".Args(value, Ontologies.Xsd.@decimal), Namespaces); }
-
-            private Resource IriCreator(string value)
-            { return new Iri(value, Namespaces); }
-
-            private Resource BlankCreator(string value)
-            { return new Blank(value); }
-
-            private Resource AnonCreator(string value)
-            { return NewBlank(); }
-
-            private Resource NilCreator(string value)
-            { return Ontologies.Rdf.nil; }
-
-            private Resource StringCreator(string value)
-            { return new Literal(value, Namespaces); }
-
-            private Resource ACreator(string value)
-            { return Ontologies.Rdf.type; }
-
-            private Resource NewBlank()
-            { return Rdf.Blank.NewBlank(); }
-
-            #endregion
-
-            #endregion
-
-            public void Dispose()
-            {
-                // Cancellation.Cancel();
-            }
+        public void Dispose()
+        {
+            // Cancellation.Cancel();
         }
     }
 }

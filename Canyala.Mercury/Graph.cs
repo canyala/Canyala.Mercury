@@ -37,13 +37,13 @@ using Canyala.Lagoon.Models;
 using Canyala.Lagoon.Serialization;
 using Canyala.Lagoon.Text;
 
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
 using Canyala.Mercury.Storage.Collections;
 using Canyala.Mercury.Storage.Extensions;
-using Canyala.Mercury.Extensions;
-using Canyala.Mercury.Internal;
+using Canyala.Mercury.Core.Extensions;
+using Canyala.Mercury.Core.Internal;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 /// <summary>
 /// Provides a collection for graphs, a storage for { subject, predicate, object } triples.

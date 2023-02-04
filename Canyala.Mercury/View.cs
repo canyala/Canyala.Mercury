@@ -34,7 +34,7 @@ using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 using Canyala.Mercury.Storage.Collections;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 /// <summary>
 /// Provides a view interface.

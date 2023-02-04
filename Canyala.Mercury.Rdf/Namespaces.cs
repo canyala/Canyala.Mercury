@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 
 using Canyala.Lagoon.Extensions;
 
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
 
 namespace Canyala.Mercury.Rdf;
 

@@ -35,11 +35,11 @@ using Canyala.Lagoon.Contracts;
 using Canyala.Lagoon.Extensions;
 using Canyala.Lagoon.Functional;
 
-using Canyala.Mercury;
+using Canyala.Mercury.Core;
+using Canyala.Mercury.Core.Text;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Internal;
 using Canyala.Mercury.Storage.Collections;
-using Canyala.Mercury.Text;
 
 namespace Canyala.Mercury.Rdf;
 

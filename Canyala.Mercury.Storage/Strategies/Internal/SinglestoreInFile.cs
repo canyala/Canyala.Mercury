@@ -31,51 +31,50 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Canyala.Mercury.Storage.Strategies.Internal
+namespace Canyala.Mercury.Storage.Strategies.Internal;
+
+/// <summary>
+/// Implements a single store in file heap factory closure.
+/// </summary>
+internal class SinglestoreInFile : Strategy
 {
-    /// <summary>
-    /// Implements a single store in file heap factory closure.
-    /// </summary>
-    internal class SinglestoreInFile : Strategy
+    public SinglestoreInFile(int heapSize, string filePath)
     {
-        public SinglestoreInFile(int heapSize, string filePath)
+        HeapFactory = HeapFactoryClosure;
+        HeapSize = heapSize;
+        FilePath = filePath;
+    }
+
+    private Heap? _singleHeap;
+
+    public int HeapSize { get; set; }
+
+    public string FilePath { get; set; }
+
+    public Heap HeapFactoryClosure(Type type)
+    {
+        if (_singleHeap == null)
         {
-            HeapFactory = HeapFactoryClosure;
-            HeapSize = heapSize;
-            FilePath = filePath;
-        }
-
-        private Heap? _singleHeap;
-
-        public int HeapSize { get; set; }
-
-        public string FilePath { get; set; }
-
-        public Heap HeapFactoryClosure(Type type)
-        {
-            if (_singleHeap == null)
+            if (!File.Exists(FilePath))
             {
-                if (!File.Exists(FilePath))
-                {
-                    string? directory = Path.GetDirectoryName(FilePath);
-                    if (!String.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+                string? directory = Path.GetDirectoryName(FilePath);
+                if (!String.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+                _singleHeap = new Heap(new FileStream(FilePath, FileMode.OpenOrCreate), HeapSize);
+            } 
+            else
+            {
+                if (new FileInfo(FilePath).Length == 0)
                     _singleHeap = new Heap(new FileStream(FilePath, FileMode.OpenOrCreate), HeapSize);
-                } 
                 else
-                {
-                    if (new FileInfo(FilePath).Length == 0)
-                        _singleHeap = new Heap(new FileStream(FilePath, FileMode.OpenOrCreate), HeapSize);
-                    else
-                        _singleHeap = new Heap(new FileStream(FilePath, FileMode.OpenOrCreate));
-                }
+                    _singleHeap = new Heap(new FileStream(FilePath, FileMode.OpenOrCreate));
             }
-
-            return _singleHeap;
         }
 
-        public override void Remove()
-        {
-            File.Delete(FilePath);
-        }
+        return _singleHeap;
+    }
+
+    public override void Remove()
+    {
+        File.Delete(FilePath);
     }
 }

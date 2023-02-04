@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 using Environment = Canyala.Mercury.Storage.Environment;
 
-namespace Canyala.Mercury;
+namespace Canyala.Mercury.Core;
 
 /// <summary>
 /// Provides a graph data set.

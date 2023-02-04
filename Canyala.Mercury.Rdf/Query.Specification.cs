@@ -33,36 +33,35 @@ using System.Threading.Tasks;
 using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Internal;
 
-namespace Canyala.Mercury.Rdf
+namespace Canyala.Mercury.Rdf;
+
+/// <summary>
+/// 
+/// </summary>
+public partial class Query
 {
     /// <summary>
     /// 
     /// </summary>
-    public partial class Query
+    internal class Specification
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        internal class Specification
+        public Namespaces Namespaces { get; private set; }
+        public List<Group> Groups { get; private set; }
+        public BuiltIns BuiltIns { get; private set; }
+        public Operators Operators { get; private set; }
+
+        public Specification()
         {
-            public Namespaces Namespaces { get; private set; }
-            public List<Group> Groups { get; private set; }
-            public BuiltIns BuiltIns { get; private set; }
-            public Operators Operators { get; private set; }
+            Groups = new List<Group>();
+            Namespaces = new Namespaces();
+            Operators = new Operators();
+            BuiltIns = new BuiltIns();
 
-            public Specification()
-            {
-                Groups = new List<Group>();
-                Namespaces = new Namespaces();
-                Operators = new Operators();
-                BuiltIns = new BuiltIns();
-
-                Operators.Namespaces = Namespaces;
-                BuiltIns.Namespaces = Namespaces;
-                BuiltIns.Operators = Operators;
-            }
-
-            internal static Specification Empty = new Specification();
+            Operators.Namespaces = Namespaces;
+            BuiltIns.Namespaces = Namespaces;
+            BuiltIns.Operators = Operators;
         }
+
+        internal static Specification Empty = new Specification();
     }
 }

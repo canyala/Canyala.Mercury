@@ -35,50 +35,49 @@ using Canyala.Lagoon.Extensions;
 
 using Canyala.Mercury.Storage.Strategies.Internal;
 
-namespace Canyala.Mercury.Storage
+namespace Canyala.Mercury.Storage;
+
+/// <summary>
+/// Provides a storage strategy factory for common scenarios.
+/// </summary>
+public abstract class Strategy
 {
-    /// <summary>
-    /// Provides a storage strategy factory for common scenarios.
-    /// </summary>
-    public abstract class Strategy
+    public Func<Type, Heap> HeapFactory { get; protected set; }
+
+    public abstract void Remove();
+
+    protected Strategy()
     {
-        public Func<Type, Heap> HeapFactory { get; protected set; }
-
-        public abstract void Remove();
-
-        protected Strategy()
-        {
-            HeapFactory = NotImplementedHeapFactory;  // TODO: Refactor...
-        }
-
-        private Heap NotImplementedHeapFactory(Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates a factory method closure that creates multiple in memory heaps.
-        /// </summary>
-        /// <param name="heapSize">The maximum size of the heaps created.</param>
-        /// <returns>A heap factory method.</returns>
-        public static Strategy PolystoreInMemory(int heapSize)
-            { return new PolystoreInMemory(heapSize); }
-
-        /// <summary>
-        /// Creates a factory method closure that creates a single in memory heap.
-        /// </summary>
-        /// <param name="heapSize">The maximum size of the heap.</param>
-        /// <returns>A heap factory method.</returns>
-        public static Strategy SinglestoreInMemory(int heapSize)
-            { return new SinglestoreInMemory(heapSize); }
-
-        /// <summary>
-        /// Creates a factory method closure that creates a single file based heap.
-        /// </summary>
-        /// <param name="heapSize">The maximum size of the heap.</param>
-        /// <param name="filePath">The path to the single file based heap.</param>
-        /// <returns>A heap factory method.</returns>
-        public static Strategy SinglestoreInFile(int heapSize, string filePath)
-            { return new SinglestoreInFile(heapSize, filePath); }
+        HeapFactory = NotImplementedHeapFactory;  // TODO: Refactor...
     }
+
+    private Heap NotImplementedHeapFactory(Type type)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Creates a factory method closure that creates multiple in memory heaps.
+    /// </summary>
+    /// <param name="heapSize">The maximum size of the heaps created.</param>
+    /// <returns>A heap factory method.</returns>
+    public static Strategy PolystoreInMemory(int heapSize)
+        { return new PolystoreInMemory(heapSize); }
+
+    /// <summary>
+    /// Creates a factory method closure that creates a single in memory heap.
+    /// </summary>
+    /// <param name="heapSize">The maximum size of the heap.</param>
+    /// <returns>A heap factory method.</returns>
+    public static Strategy SinglestoreInMemory(int heapSize)
+        { return new SinglestoreInMemory(heapSize); }
+
+    /// <summary>
+    /// Creates a factory method closure that creates a single file based heap.
+    /// </summary>
+    /// <param name="heapSize">The maximum size of the heap.</param>
+    /// <param name="filePath">The path to the single file based heap.</param>
+    /// <returns>A heap factory method.</returns>
+    public static Strategy SinglestoreInFile(int heapSize, string filePath)
+        { return new SinglestoreInFile(heapSize, filePath); }
 }

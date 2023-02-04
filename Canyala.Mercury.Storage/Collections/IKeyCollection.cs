@@ -30,15 +30,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Canyala.Mercury.Storage.Collections
+namespace Canyala.Mercury.Storage.Collections;
+
+public interface IKeyCollection<T>
 {
-    public interface IKeyCollection<T>
-    {
-        T Min { get; }
-        T Max { get; }
-        long Magnitude { get; }
-        bool Contains(T element);
-        IEnumerable<T> Between(T low, T high);
-        IEnumerable<T> Enumerate();
-    }
+    T Min { get; }
+    T Max { get; }
+    long Magnitude { get; }
+    bool Contains(T element);
+    IEnumerable<T> Between(T low, T high);
+    IEnumerable<T> Enumerate();
 }
