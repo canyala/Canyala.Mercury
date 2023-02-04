@@ -28,7 +28,7 @@ using System;
 using Canyala.Mercury.Rdf;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Canyala.Mercury.Core;
+using Canyala.Mercury.Core; // 
 
 namespace Canyala.Mercury.Test;
 
