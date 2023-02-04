@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Canyala.Lagoon\Canyala.Lagoon.Core\Canyala.Lagoon.Core.csproj" />
+    <ProjectReference Include="..\Canyala.Mercury.Core\Canyala.Mercury.Core.csproj" />
+  </ItemGroup>
+
+</Project>
