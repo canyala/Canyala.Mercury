@@ -45,7 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "documents", "documents", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{95FAF741-3F01-4C72-9FDF-43409E2AA2D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Canyala.Mercury", "Canyala.Mercury\Canyala.Mercury.csproj", "{003FA833-E653-450E-A740-B67812358A38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Canyala.Mercury.Core", "Canyala.Mercury.Core\Canyala.Mercury.Core.csproj", "{003FA833-E653-450E-A740-B67812358A38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

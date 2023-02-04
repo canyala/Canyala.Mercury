@@ -15,7 +15,7 @@
     <PackageReference Include="coverlet.collector" Version="3.2.0"><IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 <PrivateAssets>all</PrivateAssets>
 </PackageReference>
-    <ProjectReference Include="..\Canyala.Mercury\Canyala.Mercury.csproj" />
+    <ProjectReference Include="..\Canyala.Mercury.Core\Canyala.Mercury.Core.csproj" />
     <ProjectReference Include="..\Canyala.Mercury.Rdf\Canyala.Mercury.Rdf.csproj" />
   </ItemGroup>
   

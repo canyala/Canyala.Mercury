@@ -8,6 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Canyala.Lagoon\Canyala.Lagoon.Core\Canyala.Lagoon.Core.csproj" />
-    <ProjectReference Include="..\Canyala.Mercury\Canyala.Mercury.csproj" />
+    <ProjectReference Include="..\Canyala.Mercury.Core\Canyala.Mercury.Core.csproj" />
   </ItemGroup>
 </Project>
