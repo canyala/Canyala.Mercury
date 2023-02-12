@@ -33,7 +33,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Canyala.Mercury.Core.Internal;
 using Canyala.Mercury.Storage;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class HeapIndexTest

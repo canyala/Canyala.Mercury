@@ -36,7 +36,7 @@ using Canyala.Mercury.Rdf;
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class QueryOrderByTest

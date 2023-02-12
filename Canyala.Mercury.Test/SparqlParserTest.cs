@@ -44,7 +44,7 @@ using Canyala.Mercury.Storage.Collections;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class SparqlParserTest

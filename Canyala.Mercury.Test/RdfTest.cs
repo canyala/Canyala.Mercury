@@ -46,7 +46,7 @@ using Canyala.Mercury.Rdf.Serialization;
 
 using Canyala.Test.Tools;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class RdfTest

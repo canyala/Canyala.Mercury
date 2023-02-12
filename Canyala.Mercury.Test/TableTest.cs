@@ -37,7 +37,7 @@ using Canyala.Mercury.Core;
 using Canyala.Mercury.Rdf.Extensions;
 using System.Linq.Expressions;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class TableTest

@@ -34,7 +34,7 @@ using Canyala.Lagoon.Core.Functional;
 
 using Canyala.Mercury.Core.Text;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class ParserTest

@@ -37,7 +37,7 @@ using Canyala.Lagoon.Core.Functional;
 using Canyala.Mercury.Storage;
 using Canyala.Mercury.Storage.Internal;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class AATreeTest

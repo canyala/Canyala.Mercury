@@ -39,7 +39,7 @@ using Canyala.Mercury.Rdf.Serialization;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 [TestClass]
 public class QueryFilterTest

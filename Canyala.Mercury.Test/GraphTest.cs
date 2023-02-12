@@ -45,7 +45,7 @@ using Canyala.Mercury.Storage;
 
 using Environment = Canyala.Mercury.Storage.Environment;
 
-namespace Canyala.Mercury.Test;
+namespace Canyala.Mercury.Test.All;
 
 public static class RulesCreatedForTestingPurposes
 {
