@@ -44,6 +44,7 @@ namespace Canyala.Mercury.Storage.Collections;
 /// </summary>
 /// <typeparam name="T">Element type.</typeparam>
 public class SortedHeapSet<T> : Storage.Object, ISet<T>, IOrderedCollection<T,T>
+    where T : IComparable, IComparable<T> 
 {
     private readonly Allocator<T> _objects;
     private readonly AATree _tree;
@@ -119,7 +120,7 @@ public class SortedHeapSet<T> : Storage.Object, ISet<T>, IOrderedCollection<T,T>
     }
 
     /// <summary>
-    /// Gets a value representiung the maximum value of the sorted set.
+    /// Gets a value representing the maximum value of the sorted set.
     /// </summary>
     public T Max
     {
@@ -142,11 +143,8 @@ public class SortedHeapSet<T> : Storage.Object, ISet<T>, IOrderedCollection<T,T>
     /// <returns>A sequence of items.</returns>
     public IEnumerable<T> Enumerate(T value, bool ascending, bool inclusive)
     {
-        if (value is IComparable<T> comparableItem)
-            foreach (var nodeData in _tree.Enumerate(data => comparableItem.CompareTo(_objects[data]), ascending, inclusive))
-                yield return _objects[nodeData[0]];
-
-        throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
+        foreach (var nodeData in _tree.Enumerate(data => value.CompareTo(_objects[data]), ascending, inclusive))
+            yield return _objects[nodeData[0]];
     }
 
     /// <summary>
@@ -159,14 +157,8 @@ public class SortedHeapSet<T> : Storage.Object, ISet<T>, IOrderedCollection<T,T>
     /// <returns></returns>
     public IEnumerable<T> Enumerate(T lowValue, T highValue, bool ascending, bool inclusive)
     {
-        if (!(lowValue is IComparable lowComparable))
-            throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
-
-        if (!(highValue is IComparable<T> highComparable))
-            throw new InvalidCastException($"{typeof(T).Name} does not implement {nameof(IComparable)}");
-
-        Func<long,long> lowComparer = data => lowComparable.CompareTo(_objects[data]);
-        Func<long,long> highComparer = data => highComparable.CompareTo(_objects[data]);
+        Func<long, long> lowComparer = data => lowValue.CompareTo(_objects[data]);
+        Func<long, long> highComparer = data => highValue.CompareTo(_objects[data]);
 
         foreach (var nodeData in _tree.Enumerate(lowComparer, highComparer, ascending, inclusive))
             yield return _objects[nodeData[0]];
