@@ -32,7 +32,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-using Canyala.Lagoon.Functional;
+using Canyala.Lagoon.Core.Functional;
 
 using Canyala.Mercury.Storage.Allocators;
 using Canyala.Mercury.Storage.Internal;

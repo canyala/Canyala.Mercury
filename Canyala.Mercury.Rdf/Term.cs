@@ -30,8 +30,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
 
 namespace Canyala.Mercury.Rdf;
 

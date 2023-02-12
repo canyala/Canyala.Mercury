@@ -30,8 +30,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-using Canyala.Lagoon.Collections;
-using Canyala.Lagoon.Functional;
+using Canyala.Lagoon.Core.Collections;
+using Canyala.Lagoon.Core.Functional;
 
 using Canyala.Mercury;
 using Canyala.Mercury.Storage;

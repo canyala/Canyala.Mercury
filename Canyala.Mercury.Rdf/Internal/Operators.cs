@@ -31,8 +31,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Extensions;
+using Canyala.Lagoon.Core.Contracts;
+using Canyala.Lagoon.Core.Extensions;
 
 using Canyala.Mercury.Core;
 

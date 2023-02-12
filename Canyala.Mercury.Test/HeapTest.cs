@@ -31,7 +31,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Canyala.Lagoon.Extensions;
+using Canyala.Lagoon.Core.Extensions;
 
 using Canyala.Mercury.Storage;
 using Canyala.Mercury.Storage.Internal;

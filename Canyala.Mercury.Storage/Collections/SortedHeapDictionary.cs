@@ -30,7 +30,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-using Canyala.Lagoon.Functional;
+using Canyala.Lagoon.Core.Functional;
 
 using Canyala.Mercury.Storage;
 using Canyala.Mercury.Storage.Allocators;

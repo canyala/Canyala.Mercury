@@ -34,9 +34,9 @@ using System.Text;
 using System.Threading;
 using System.Runtime.CompilerServices;
 
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
+using Canyala.Lagoon.Core.Contracts;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
 
 using Canyala.Mercury.Storage.Extensions;
 

@@ -24,18 +24,8 @@
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-
+using Canyala.Lagoon.Core.Extensions;
 
 using Canyala.Mercury.Storage.Internal;
 

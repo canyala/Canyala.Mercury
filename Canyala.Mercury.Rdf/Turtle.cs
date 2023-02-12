@@ -30,9 +30,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-using Canyala.Lagoon.Text;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
+using Canyala.Lagoon.Core.Text;
 
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Core.Text;

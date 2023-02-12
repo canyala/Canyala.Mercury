@@ -24,24 +24,19 @@
 
 */
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.IO;
 
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.IO;
+using Canyala.Lagoon.Core.Contracts;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.IO;
 
 using Canyala.Mercury.Storage.Extensions;
 
 namespace Canyala.Mercury.Storage;
 
 /// <summary>
-/// Provides a threadsafe stream based heap with automatic optimistic block reclaim and
+/// Provides a thread safe stream based heap with automatic optimistic block reclaim and
 /// full garbage collection capabilities. Full GC is not automatic but invoked explicitly.
 /// The underlying stream is required to support 'Seek', 'Read' & 'Write'.
 /// </summary>

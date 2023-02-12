@@ -31,10 +31,10 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-using Canyala.Lagoon.Text;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-using Canyala.Lagoon.Contracts;
+using Canyala.Lagoon.Core.Text;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
+using Canyala.Lagoon.Core.Contracts;
 
 namespace Canyala.Mercury.Core.Text;
 

@@ -29,12 +29,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Canyala.Lagoon.Collections;
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-using Canyala.Lagoon.Models;
-using Canyala.Lagoon.Text;
+using Canyala.Lagoon.Core.Collections;
+using Canyala.Lagoon.Core.Contracts;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
+using Canyala.Lagoon.Core.Models;
+using Canyala.Lagoon.Core.Text;
 
 using Canyala.Mercury.Rdf.Serialization;
 

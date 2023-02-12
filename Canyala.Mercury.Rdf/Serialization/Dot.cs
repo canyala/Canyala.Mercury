@@ -30,7 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Canyala.Lagoon.Extensions;
+using Canyala.Lagoon.Core.Extensions;
 
 using Canyala.Mercury.Rdf.Extensions;
 using Canyala.Mercury.Rdf.Serialization;

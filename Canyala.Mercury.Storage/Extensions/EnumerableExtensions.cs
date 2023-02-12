@@ -31,7 +31,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Canyala.Lagoon.Extensions;
+using Canyala.Lagoon.Core.Extensions;
 
 namespace Canyala.Mercury.Storage.Extensions;
 

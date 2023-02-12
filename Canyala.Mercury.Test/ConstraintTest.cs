@@ -29,11 +29,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Canyala.Lagoon.Collections;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-using Canyala.Lagoon.Serialization;
-using Canyala.Lagoon.Text;
+using Canyala.Lagoon.Core.Collections;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
+using Canyala.Lagoon.Core.Serialization;
+using Canyala.Lagoon.Core.Text;
 
 using Canyala.Mercury.Core;
 using Canyala.Mercury.Rdf;

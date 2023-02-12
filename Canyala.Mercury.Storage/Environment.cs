@@ -29,7 +29,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-using Canyala.Lagoon.Extensions;
+using Canyala.Lagoon.Core.Extensions;
 
 using Canyala.Mercury.Storage;
 using Canyala.Mercury.Storage.Allocators;

@@ -30,12 +30,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-using Canyala.Lagoon.Models;
-using Canyala.Lagoon.Serialization;
-using Canyala.Lagoon.Text;
+using Canyala.Lagoon.Core.Contracts;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
+using Canyala.Lagoon.Core.Models;
+using Canyala.Lagoon.Core.Serialization;
+using Canyala.Lagoon.Core.Text;
 
 using Canyala.Mercury.Core;
 using Canyala.Mercury.Storage.Collections;

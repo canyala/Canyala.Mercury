@@ -31,11 +31,11 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-using Canyala.Lagoon.Collections;
-using Canyala.Lagoon.Contracts;
-using Canyala.Lagoon.Expressions;
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
+using Canyala.Lagoon.Core.Collections;
+using Canyala.Lagoon.Core.Contracts;
+using Canyala.Lagoon.Core.Expressions;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
 
 using Canyala.Mercury.Core;
 using Canyala.Mercury.Rdf.Extensions;

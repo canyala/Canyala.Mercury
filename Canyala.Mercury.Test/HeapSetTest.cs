@@ -34,9 +34,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Canyala.Lagoon.Extensions;
-using Canyala.Lagoon.Functional;
-using Canyala.Lagoon.Text;
+using Canyala.Lagoon.Core.Extensions;
+using Canyala.Lagoon.Core.Functional;
+using Canyala.Lagoon.Core.Text;
 
 using Canyala.Mercury.Storage;
 using Canyala.Mercury.Storage.Collections;
