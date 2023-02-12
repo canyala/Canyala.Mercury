@@ -24,3 +24,13 @@ Canyala.Mercury
 Canyala.Mercury.Rdf
 Canyala.Mercury.Storage
 Canyala.Mercury.Test
+
+
+##grab latest commits from server
+git submodule update --recursive --remote
+
+##above command will set current branch to detached HEAD. set back to master.
+git submodule foreach git checkout master
+
+##now do pull to fast-forward to latest commit
+git submodule foreach git pull origin master
