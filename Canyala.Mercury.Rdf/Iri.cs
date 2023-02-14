@@ -42,9 +42,9 @@ namespace Canyala.Mercury.Rdf;
 /// </summary>
 public class Iri : Resource
 {
-    private readonly string _prefix;
-    private readonly string _namespace;
-    private readonly string _class;
+    private readonly string? _prefix;
+    private readonly string? _namespace;
+    private readonly string? _class;
 
     internal Iri(string text, Namespaces namespaces)
     {
@@ -54,8 +54,8 @@ public class Iri : Resource
 
     internal Iri(Iri iri, Namespaces namespaces)
     {
-        _prefix = namespaces.PrefixOf(iri._namespace) ?? string.Empty;
         _namespace = iri._namespace ?? string.Empty;
+        _prefix = namespaces.PrefixOf(_namespace) ?? string.Empty;
         _class = iri._class;
     }
 
@@ -101,15 +101,15 @@ public class Iri : Resource
     {
         get
         {
-            if (_prefix == null)
+            if (_prefix is null)
             {
-                if (_namespace == null)
+                if (_namespace is null)
                     return Full;
 
                 return string.Concat('<', _class, '>');
             }
 
-            return String.Concat(_prefix, ':', EncodeEscape(_class));
+            return String.Concat(_prefix, ':', EncodeEscape(_class ?? string.Empty));
         }
     }
 
@@ -117,8 +117,12 @@ public class Iri : Resource
     { 
         get 
         {
-            if (_prefix == null)
-                return _namespace.IsEmpty() ? _class : _class.ResolveRelative(_namespace);
+            if (_prefix is null)
+            {
+                var @class = _class ?? string.Empty;
+                var @namespace = _namespace ?? string.Empty;
+                return @namespace.IsEmpty() ? @class : @class.ResolveRelative(@namespace);
+            }
             else
                 return string.Concat(_namespace, _class);
         } 

@@ -131,7 +131,7 @@ public class Resource : Term
         return encoded.ToString();
     }
 
-    protected static bool SplitIRI(string text, Namespaces namespaces, out string prefix, out string @namespace, out string name)
+    protected static bool SplitIRI(string text, Namespaces namespaces, out string? prefix, out string? @namespace, out string? name)
     {
         if (text[0] == '<' && text[text.Length - 1] == '>')
         {
@@ -142,9 +142,9 @@ public class Resource : Term
 
             var ns = namespaces.FirstOrDefault(binding => text.StartsWith(binding.Namespace));
 
-            if (ns == null)
+            if (ns is null)
             {
-                prefix = string.Empty;
+                prefix = null;
                 if (text.ResolveAbsolute(namespaces.Base, out name, out @namespace))
                 { 
                     if (name.StartsWith(".."))
@@ -152,7 +152,7 @@ public class Resource : Term
                 }
                 else
                 {
-                    @namespace = string.Empty;
+                    @namespace = null;
                     name = text;
                 }
                 return true;
@@ -175,7 +175,7 @@ public class Resource : Term
         }
         catch
         {
-            prefix = @namespace = name = string.Empty;
+            prefix = @namespace = name = null;
             return false;
         }
     }

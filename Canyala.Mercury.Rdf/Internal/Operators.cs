@@ -48,7 +48,9 @@ public class Operators
 
     public Operators() { }
 
-    static public Resource Or(Resource left, Resource right)
+#pragma warning disable CA1822 // No mark members as static, used by reflection!
+
+    public Resource Or(Resource left, Resource right)
     {
         bool? booleanLeft = EffectiveBooleanValue(left);
         bool? booleanRight = EffectiveBooleanValue(right);
@@ -63,7 +65,7 @@ public class Operators
             return booleanRight!.Value ? Literal.From(true) : Resource.Error;
     }
 
-    static public Resource And(Resource left, Resource right)
+    public Resource And(Resource left, Resource right)
     {
         bool? booleanLeft = EffectiveBooleanValue(left);
         bool? booleanRight = EffectiveBooleanValue(right);
@@ -561,4 +563,7 @@ public class Operators
 
         return null;
     }
+
+#pragma warning restore CA1822 // Mark members as static
+
 }

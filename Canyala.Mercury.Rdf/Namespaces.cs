@@ -73,13 +73,10 @@ public class Namespaces : IEnumerable<Namespaces.Binding>
     public void Add(Binding binding)
     {
         var byPrefix = FindByPrefix(binding.Prefix);
-        var byNamespace = FindByNamespace(binding.Namespace);
 
-        if (byNamespace is null && byPrefix is null)
-            _bindings.Add(binding);
-        else if (byPrefix is not null)
-            byPrefix.Namespace = binding.Namespace; // Yes, an update...
-        else if (byNamespace is null)
+        if (byPrefix is not null)
+            byPrefix.Namespace = binding.Namespace;
+        else
             _bindings.Add(binding);
     }
 

@@ -763,7 +763,7 @@ public partial class Query
         {
             var rhs = Expressions.Pop();
             var lhs = Expressions.Pop();
-            Expressions.Push(Expression.Call(Expression.Constant(Plan.Operators), "AreEqual", null, lhs, rhs));   // Named "AreEquals" to not collide with the Object.Equals() method!
+            Expressions.Push(Expression.Call(Expression.Constant(Plan.Operators), "AreEqual", null, lhs, rhs));   // Named "AreEqual" to not collide with the Object.Equals() method!
         }
 
         internal void BinaryOperatorExpressionNotEquals()

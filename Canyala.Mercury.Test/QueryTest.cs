@@ -47,6 +47,17 @@ namespace Canyala.Mercury.Test.All;
 [TestClass]
 public class QueryTest
 {
+    [TestMethod]
+    public void QueryBase()
+    {
+        // TODO: Implement test for BASE directive
+        /*
+        var query = new Query();
+        _ = Sparql.Translate("BASE <http://canyala.se/sparql#test1>", query, out _);
+        Assert.AreEqual("http://canyala.se/sparql#test1", query.Plan.Namespaces.Base);
+        */
+    }
+
     /// <summary>
     /// Written 2013-04-28 07.23
     /// </summary>
