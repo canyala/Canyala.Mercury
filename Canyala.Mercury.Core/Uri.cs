@@ -2,7 +2,7 @@
 
   MIT License
  
-  Copyright (c) 2022 Canyala Innovation (Martin Fredriksson)
+  Copyright (c) 2011-2023 Canyala Innovation (Martin Fredriksson)
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
