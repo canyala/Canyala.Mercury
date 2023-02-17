@@ -149,325 +149,329 @@ public partial class Turtle : Parser<Turtle.Producer>
 
     /* Production declarations */
 
-    /// <summary>
-    /// turtleDoc ::= statement* 
-    /// </summary>
-    static readonly Func<Production> turtleDoc = () => _("turtleDoc", All(ZeroOrMore(statement))); 
-    /// <summary>
-    /// statement ::= directive |  triples '.'     
-    /// </summary>
-    static readonly Func<Production> statement = () => AnyOf(directive, All(triples, '.'));
-    /// <summary>
-    /// directive ::= prefixID |  base |  sparqlPrefix |  sparqlBase 
-    /// </summary>
-    static readonly Func<Production> directive = () => AnyOf(prefixID, _base, sparqlPrefix, sparqlBase);
-    /// <summary>
-    /// prefixID ::= '@prefix' PNAME_NS IRIREF '.' 
-    /// </summary>
-    static readonly Func<Production> prefixID = () => All("@prefix", Named("prefix", PNAME_NS), Named("namespace", IRIREF), '.', @PrefixAndNamespace); 
-    /// <summary>
-    /// base ::= '@base' IRIREF '.' 
-    /// </summary>
-    static readonly Func<Production> _base = () => All("@base", Named("base", IRIREF), '.', @Base); 
-    /// <summary>
-    /// sparqlBase ::= "BASE" IRIREF 
-    /// </summary>
-    static readonly Func<Production> sparqlBase = () => All(i("BASE"), All(Named("base", IRIREF), @Base));
-    /// <summary>
-    /// sparqlPrefix ::= "PREFIX" PNAME_NS IRIREF 
-    /// </summary>
-    static readonly Func<Production> sparqlPrefix = () => All(i("PREFIX"), Named("prefix", PNAME_NS), Named("namespace", IRIREF), @PrefixAndNamespace);
-    /// <summary>
-    /// triples ::= subject predicateObjectList |  blankNodePropertyList predicateObjectList? 
-    /// </summary>
-    static readonly Func<Production> triples = () => _("triples", AnyOf(All(subject, predicateObjectList), All(@AllocBlankSubject, blankNodePropertyList, Optional(predicateObjectList))));
-    /// <summary>
-    /// predicateObjectList ::= verb objectList (';' (verb objectList)?)* 
-    /// </summary>
-    static readonly Func<Production> predicateObjectList = () => _("predicateObjectList", All(verb, objectList, ZeroOrMore(';', Optional(verb, objectList))));
-    /// <summary>
-    /// objectList ::= object (',' object)* 
-    /// </summary>
-    static readonly Func<Production> objectList = () => _("objectList", All(_object, ZeroOrMore(',', _object))); 
-    /// <summary>
-    /// verb ::= predicate |  'a' 
-    /// </summary>
-    static readonly Func<Production> verb = () => _("verb", All(Named("predicate", AnyOf(predicate, All(@A, Named("node", 'a')))), @Predicate));
-    /// <summary>
-    /// subject ::= iri |  BlankNode |  collection 
-    /// </summary>
-    static readonly Func<Production> subject = () => _("subject", All(AnyOf(Named("subject", All(@Iri,iri)), Named("subject", BlankNode), All(@AllocBlankSubject, collection)), @Subject));
-    /// <summary>
-    /// predicate ::= iri 
-    /// </summary>
-    static readonly Func<Production> predicate = () => _("predicate", All(@Iri, iri));
-    /// <summary>
-    /// object ::= collection |  blankNodePropertyList | iri | BlankNode | literal
-    /// </summary>
-    static readonly Func<Production> _object = () => _("_object", AnyOf( AnyOf(All(@AllocBlankObject, collection), All(@AllocBlankObject, blankNodePropertyList)), All(Named("object", AnyOf(All(@Iri,iri), BlankNode, literal)), @Object))); 
-    /// <summary>
-    /// literal ::= RDFLiteral |  NumericLiteral |  BooleanLiteral 
-    /// </summary>
-    static readonly Func<Production> literal = () => _("literal", Named("node", AnyOf(RDFLiteral, NumericLiteral, BooleanLiteral)));
-    /// <summary>
-    /// blankNodePropertyList ::= '[' predicateObjectList ']' 
-    /// </summary>
-    static readonly Func<Production> blankNodePropertyList = () => _("blankNodePropertyList", All(@BeginPropertyList, '[', predicateObjectList, ']', @EndPropertyList));
-    /// <summary>
-    /// collection ::= '(' object* ')' 
-    /// </summary>
-    static readonly Func<Production> collection = () => _("collection", All(@BeginCollection, '(', ZeroOrMore(_object), ')', @EndCollection)); 
+    private class Productions
+    {
+        /// <summary>
+        /// ROOT! turtleDoc ::= statement* 
+        /// </summary>
+        public static readonly Func<Production> turtleDoc = () => _(nameof(turtleDoc), All(ZeroOrMore(statement)));
+        /// <summary>
+        /// statement ::= directive |  triples '.'     
+        /// </summary>
+        static readonly Func<Production> statement = () => AnyOf(directive, All(triples, '.'));
+        /// <summary>
+        /// directive ::= prefixID |  base |  sparqlPrefix |  sparqlBase 
+        /// </summary>
+        static readonly Func<Production> directive = () => AnyOf(prefixID, _base, sparqlPrefix, sparqlBase);
+        /// <summary>
+        /// prefixID ::= '@prefix' PNAME_NS IRIREF '.' 
+        /// </summary>
+        static readonly Func<Production> prefixID = () => All("@prefix", Named("prefix", PNAME_NS), Named("namespace", IRIREF), '.', @PrefixAndNamespace);
+        /// <summary>
+        /// base ::= '@base' IRIREF '.' 
+        /// </summary>
+        static readonly Func<Production> _base = () => All("@base", Named("base", IRIREF), '.', @Base);
+        /// <summary>
+        /// sparqlBase ::= "BASE" IRIREF 
+        /// </summary>
+        static readonly Func<Production> sparqlBase = () => All(i("BASE"), All(Named("base", IRIREF), @Base));
+        /// <summary>
+        /// sparqlPrefix ::= "PREFIX" PNAME_NS IRIREF 
+        /// </summary>
+        static readonly Func<Production> sparqlPrefix = () => All(i("PREFIX"), Named("prefix", PNAME_NS), Named("namespace", IRIREF), @PrefixAndNamespace);
+        /// <summary>
+        /// triples ::= subject predicateObjectList |  blankNodePropertyList predicateObjectList? 
+        /// </summary>
+        static readonly Func<Production> triples = () => _(nameof(triples), AnyOf(All(subject, predicateObjectList), All(@AllocBlankSubject, blankNodePropertyList, Optional(predicateObjectList))));
+        /// <summary>
+        /// predicateObjectList ::= verb objectList (';' (verb objectList)?)* 
+        /// </summary>
+        static readonly Func<Production> predicateObjectList = () => _(nameof(predicateObjectList), All(verb, objectList, ZeroOrMore(';', Optional(verb, objectList))));
+        /// <summary>
+        /// objectList ::= object (',' object)* 
+        /// </summary>
+        static readonly Func<Production> objectList = () => _(nameof(objectList), All(_object, ZeroOrMore(',', _object)));
+        /// <summary>
+        /// verb ::= predicate |  'a' 
+        /// </summary>
+        static readonly Func<Production> verb = () => _(nameof(verb), All(Named("predicate", AnyOf(predicate, All(@A, Named("node", 'a')))), @Predicate));
+        /// <summary>
+        /// subject ::= iri |  BlankNode |  collection 
+        /// </summary>
+        static readonly Func<Production> subject = () => _(nameof(subject), All(AnyOf(Named("subject", All(@Iri, iri)), Named("subject", BlankNode), All(@AllocBlankSubject, collection)), @Subject));
+        /// <summary>
+        /// predicate ::= iri 
+        /// </summary>
+        static readonly Func<Production> predicate = () => _(nameof(predicate), All(@Iri, iri));
+        /// <summary>
+        /// object ::= collection |  blankNodePropertyList | iri | BlankNode | literal
+        /// </summary>
+        static readonly Func<Production> _object = () => _("object", AnyOf(AnyOf(All(@AllocBlankObject, collection), All(@AllocBlankObject, blankNodePropertyList)), All(Named("object", AnyOf(All(@Iri, iri), BlankNode, literal)), @Object)));
+        /// <summary>
+        /// literal ::= RDFLiteral |  NumericLiteral |  BooleanLiteral 
+        /// </summary>
+        static readonly Func<Production> literal = () => _(nameof(literal), Named("node", AnyOf(RDFLiteral, NumericLiteral, BooleanLiteral)));
+        /// <summary>
+        /// blankNodePropertyList ::= '[' predicateObjectList ']' 
+        /// </summary>
+        static readonly Func<Production> blankNodePropertyList = () => _(nameof(blankNodePropertyList), All(@BeginPropertyList, '[', predicateObjectList, ']', @EndPropertyList));
+        /// <summary>
+        /// collection ::= '(' object* ')' 
+        /// </summary>
+        static readonly Func<Production> collection = () => _(nameof(collection), All(@BeginCollection, '(', ZeroOrMore(_object), ')', @EndCollection));
 
-    /* Production token declarations */
+        /* Production token declarations */
 
-    /// <summary>
-    /// NumericLiteral ::= INTEGER |  DECIMAL |  DOUBLE 
-    /// </summary>
-    static readonly Func<Production> NumericLiteral = () => _("numericLiteral", Token(AnyOf(All(@Double, DOUBLE), All(@Decimal, DECIMAL), All(@Integer,INTEGER))));
-    /// <summary>
-    /// RDFLiteral ::= String (LANGTAG |  '^^' iri)? 
-    /// </summary>
-    static readonly Func<Production> RDFLiteral = () => _("RDFLiteral", Token(_String, Optional(AnyOf(LANGTAG, All("^^", iri))))); 
-    /// <summary>
-    /// BooleanLiteral ::= 'true' |  'false' 
-    /// </summary>
-    static readonly Func<Production> BooleanLiteral = () => _("BooleanLiteral", Token(@Boolean, AnyOf("true", "false")));
-    /// <summary>
-    /// String ::= STRING_LITERAL_QUOTE |  STRING_LITERAL_SINGLE_QUOTE |  STRING_LITERAL_LONG_SINGLE_QUOTE |  STRING_LITERAL_LONG_QUOTE 
-    /// </summary>
-    static readonly Func<Production> _String = () => _("String", Token(@String, AnyOf(STRING_LITERAL_QUOTE, STRING_LITERAL_SINGLE_QUOTE, STRING_LITERAL_LONG_SINGLE_QUOTE, STRING_LITERAL_LONG_QUOTE)));
-    /// <summary>
-    /// PrefixedName ::= PNAME_LN |  PNAME_NS 
-    /// </summary>
-    static readonly Func<Production> PrefixedName = () => _("PrefixedName", Token(AnyOf(PNAME_LN, PNAME_NS)));
-    /// <summary>
-    /// BlankNode ::= BLANK_NODE_LABEL |  ANON 
-    /// </summary>
-    static readonly Func<Production> BlankNode = () => _("BlankNode", Named("node", Token(@Blank, AnyOf(BLANK_NODE_LABEL, ANON))));
+        /// <summary>
+        /// NumericLiteral ::= INTEGER |  DECIMAL |  DOUBLE 
+        /// </summary>
+        static readonly Func<Production> NumericLiteral = () => _(nameof(NumericLiteral), Token(AnyOf(All(@Double, DOUBLE), All(@Decimal, DECIMAL), All(@Integer, INTEGER))));
+        /// <summary>
+        /// RDFLiteral ::= String (LANGTAG |  '^^' iri)? 
+        /// </summary>
+        static readonly Func<Production> RDFLiteral = () => _(nameof(RDFLiteral), Token(_String, Optional(AnyOf(LANGTAG, All("^^", iri)))));
+        /// <summary>
+        /// BooleanLiteral ::= 'true' |  'false' 
+        /// </summary>
+        static readonly Func<Production> BooleanLiteral = () => _(nameof(BooleanLiteral), Token(@Boolean, AnyOf("true", "false")));
+        /// <summary>
+        /// String ::= STRING_LITERAL_QUOTE |  STRING_LITERAL_SINGLE_QUOTE |  STRING_LITERAL_LONG_SINGLE_QUOTE |  STRING_LITERAL_LONG_QUOTE 
+        /// </summary>
+        static readonly Func<Production> _String = () => _(nameof(String), Token(@String, AnyOf(STRING_LITERAL_QUOTE, STRING_LITERAL_SINGLE_QUOTE, STRING_LITERAL_LONG_SINGLE_QUOTE, STRING_LITERAL_LONG_QUOTE)));
+        /// <summary>
+        /// PrefixedName ::= PNAME_LN |  PNAME_NS 
+        /// </summary>
+        static readonly Func<Production> PrefixedName = () => _(nameof(PrefixedName), Token(AnyOf(PNAME_LN, PNAME_NS)));
+        /// <summary>
+        /// BlankNode ::= BLANK_NODE_LABEL |  ANON 
+        /// </summary>
+        static readonly Func<Production> BlankNode = () => _(nameof(BlankNode), Named("node", Token(@Blank, AnyOf(BLANK_NODE_LABEL, ANON))));
 
-    /* Production terminal declarations */
+        /* Production terminal declarations */
 
-    /// <summary>
-    /// iri ::= IRIREF |  PrefixedName 
-    /// </summary>
-    static readonly Func<Production> iri = () => AnyOf(IRIREF, PrefixedName);
-    /// <summary>
-    /// IRIREF ::= '<' ([^#x00-#x20<>\"{}|^`\] |  UCHAR)* '>' 
-    /// </summary>
-    static readonly Func<Production> IRIREF = () => Named("node", All('<', Named("iri", ZeroOrMore(AnyOf(NotIn(Seq.Of('^', '<', '>', '"', '{', '}', '|', '\\', '´').Concat('\x00'.UpTo('\x20'))), UCHAR))), '>'));
-    /// <summary>
-    /// PNAME_NS ::= PN_PREFIX? ':' 
-    /// </summary>
-    static readonly Func<Production> PNAME_NS = () => All(Named("name", Optional(PN_PREFIX)), ':'); 
-    /// <summary>
-    /// PNAME_LN ::= PNAME_NS PN_LOCAL 
-    /// </summary>
-    static readonly Func<Production> PNAME_LN = () => Named("node", All(PNAME_NS, PN_LOCAL));
-    /// <summary>
-    /// BLANK_NODE_LABEL ::= '_:' (PN_CHARS_U |  [0-9]) ((PN_CHARS |  '.')* PN_CHARS)? 
-    /// </summary>
-    static readonly Func<Production> BLANK_NODE_LABEL = () => All("_:", AnyOf(PN_CHARS_U, InRange('0', '9')), Optional(ZeroOrMore(AnyOf(PN_CHARS, '.'), PN_CHARS)));
-    /// <summary>
-    /// LANGTAG ::= '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)* 
-    /// </summary>
-    static readonly Func<Production> LANGTAG = () => _("LANGTAG", All('@', OneOrMore(LETTER), ZeroOrMore('-', OneOrMore(DIGIT_OR_LETTER))));
-    /// <summary>
-    /// STRING_LITERAL_QUOTE ::= '"' ([^#x22#x5C#xA#xD] |  ECHAR |  UCHAR)* '"' 
-    /// </summary>
-    static readonly Func<Production> STRING_LITERAL_QUOTE = () => All('"', ZeroOrMore(AnyOf(NotIn('\x22', '\x5C', '\xA', '\xD'), ECHAR, UCHAR)), '"'); 
-    /// <summary>
-    /// STRING_LITERAL_SINGLE_QUOTE ::= "'" ([^#x27#x5C#xA#xD] |  ECHAR |  UCHAR)* "'" 
-    /// </summary>
-    static readonly Func<Production> STRING_LITERAL_SINGLE_QUOTE = () => All("'", ZeroOrMore(AnyOf(NotIn('\x27', '\x5C', '\xA', '\xD'), ECHAR, UCHAR)), "'"); 
-    /// <summary>
-    /// STRING_LITERAL_LONG_SINGLE_QUOTE ::= "'''" (("'" |  "''")? [^'\] |  ECHAR |  UCHAR)* "'''" 
-    /// </summary>
-    static readonly Func<Production> STRING_LITERAL_LONG_SINGLE_QUOTE = () => All("'''", ZeroOrMore(AnyOf(All(Optional(AnyOf("'", "''")), NotIn('\'', '\\')), ECHAR, UCHAR)), "'''");
-    /// <summary>
-    /// STRING_LITERAL_LONG_QUOTE ::= '"""' (('"' |  '""')? [^"\] |  ECHAR |  UCHAR)* '"""' 
-    /// </summary>
-    static readonly Func<Production> STRING_LITERAL_LONG_QUOTE = () => All("\"\"\"", ZeroOrMore(AnyOf(All(Optional(AnyOf("\"", "\"\"")), NotIn('"', '\\')), ECHAR, UCHAR)), "\"\"\"");
-    /// <summary>
-    /// UCHAR ::= '\u' HEX HEX HEX HEX |  '\U' HEX HEX HEX HEX HEX HEX HEX HEX 
-    /// </summary>
-    static readonly Func<Production> UCHAR = () => AnyOf(All("\\u", HEX, HEX, HEX, HEX), All("\\U", HEX, HEX, HEX, HEX, HEX, HEX, HEX, HEX));
-    /// <summary>
-    /// ECHAR ::= '\' [tbnrf\"'] 
-    /// </summary>
-    static readonly Func<Production> ECHAR = () => All('\\', In('t', 'b', 'n', 'r', 'f', '\\', '\"', '\''));
-    /// <summary>
-    /// ANON ::= '[' WS* ']' 
-    /// </summary>
-    static readonly Func<Production> ANON = () => All('[', WHITESPACE, ']');
+        /// <summary>
+        /// iri ::= IRIREF |  PrefixedName 
+        /// </summary>
+        static readonly Func<Production> iri = () => AnyOf(IRIREF, PrefixedName);
+        /// <summary>
+        /// IRIREF ::= '<' ([^#x00-#x20<>\"{}|^`\] |  UCHAR)* '>' 
+        /// </summary>
+        static readonly Func<Production> IRIREF = () => Named("node", All('<', Named("iri", ZeroOrMore(AnyOf(NotIn(Seq.Of('^', '<', '>', '"', '{', '}', '|', '\\', '´').Concat('\x00'.UpTo('\x20'))), UCHAR))), '>'));
+        /// <summary>
+        /// PNAME_NS ::= PN_PREFIX? ':' 
+        /// </summary>
+        static readonly Func<Production> PNAME_NS = () => All(Named("name", Optional(PN_PREFIX)), ':');
+        /// <summary>
+        /// PNAME_LN ::= PNAME_NS PN_LOCAL 
+        /// </summary>
+        static readonly Func<Production> PNAME_LN = () => Named("node", All(PNAME_NS, PN_LOCAL));
+        /// <summary>
+        /// BLANK_NODE_LABEL ::= '_:' (PN_CHARS_U |  [0-9]) ((PN_CHARS |  '.')* PN_CHARS)? 
+        /// </summary>
+        static readonly Func<Production> BLANK_NODE_LABEL = () => All("_:", AnyOf(PN_CHARS_U, InRange('0', '9')), Optional(ZeroOrMore(AnyOf(PN_CHARS, '.'), PN_CHARS)));
+        /// <summary>
+        /// LANGTAG ::= '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)* 
+        /// </summary>
+        static readonly Func<Production> LANGTAG = () => _(nameof(LANGTAG), All('@', OneOrMore(LETTER), ZeroOrMore('-', OneOrMore(DIGIT_OR_LETTER))));
+        /// <summary>
+        /// STRING_LITERAL_QUOTE ::= '"' ([^#x22#x5C#xA#xD] |  ECHAR |  UCHAR)* '"' 
+        /// </summary>
+        static readonly Func<Production> STRING_LITERAL_QUOTE = () => All('"', ZeroOrMore(AnyOf(NotIn('\x22', '\x5C', '\xA', '\xD'), ECHAR, UCHAR)), '"');
+        /// <summary>
+        /// STRING_LITERAL_SINGLE_QUOTE ::= "'" ([^#x27#x5C#xA#xD] |  ECHAR |  UCHAR)* "'" 
+        /// </summary>
+        static readonly Func<Production> STRING_LITERAL_SINGLE_QUOTE = () => All("'", ZeroOrMore(AnyOf(NotIn('\x27', '\x5C', '\xA', '\xD'), ECHAR, UCHAR)), "'");
+        /// <summary>
+        /// STRING_LITERAL_LONG_SINGLE_QUOTE ::= "'''" (("'" |  "''")? [^'\] |  ECHAR |  UCHAR)* "'''" 
+        /// </summary>
+        static readonly Func<Production> STRING_LITERAL_LONG_SINGLE_QUOTE = () => All("'''", ZeroOrMore(AnyOf(All(Optional(AnyOf("'", "''")), NotIn('\'', '\\')), ECHAR, UCHAR)), "'''");
+        /// <summary>
+        /// STRING_LITERAL_LONG_QUOTE ::= '"""' (('"' |  '""')? [^"\] |  ECHAR |  UCHAR)* '"""' 
+        /// </summary>
+        static readonly Func<Production> STRING_LITERAL_LONG_QUOTE = () => All("\"\"\"", ZeroOrMore(AnyOf(All(Optional(AnyOf("\"", "\"\"")), NotIn('"', '\\')), ECHAR, UCHAR)), "\"\"\"");
+        /// <summary>
+        /// UCHAR ::= '\u' HEX HEX HEX HEX |  '\U' HEX HEX HEX HEX HEX HEX HEX HEX 
+        /// </summary>
+        static readonly Func<Production> UCHAR = () => AnyOf(All("\\u", HEX, HEX, HEX, HEX), All("\\U", HEX, HEX, HEX, HEX, HEX, HEX, HEX, HEX));
+        /// <summary>
+        /// ECHAR ::= '\' [tbnrf\"'] 
+        /// </summary>
+        static readonly Func<Production> ECHAR = () => All('\\', In('t', 'b', 'n', 'r', 'f', '\\', '\"', '\''));
+        /// <summary>
+        /// ANON ::= '[' WS* ']' 
+        /// </summary>
+        static readonly Func<Production> ANON = () => All('[', WHITESPACE, ']');
 
-    /* Production terminal declarations */
+        /* Production terminal declarations */
 
-    /// <summary>
-    /// PN_CHARS_BASE ::= [A-Z] |  [a-z] |  [#x00C0-#x00D6] |  [#x00D8-#x00F6] |  [#x00F8-#x02FF] |  [#x0370-#x037D] |  
-    ///                                     [#x037F-#x1FFF] |  [#x200C-#x200D] |  [#x2070-#x218F] |  [#x2C00-#x2FEF] |  
-    ///                                     [#x3001-#xD7FF] |  [#xF900-#xFDCF] |  [#xFDF0-#xFFFD] |  [#x10000-#xEFFFF] 
-    /// </summary>
-    static readonly Func<Production> PN_CHARS_BASE = () => AnyOf(
-        InRange(
-            'A','Z',  
-            'a','z',  
-            '\x00C0','\x00D6',  
-            '\x00D8','\x00F6',  
-            '\x00F8','\x02FF',  
-            '\x037F','\x1FFF',  
-            '\x200C','\x200D',  
-            '\x2070','\x218F',  
-            '\x2C00','\x2FEF',  
-            '\x3001','\xD7FF',  
-            '\xF900','\xFDCF',  
-            '\xFDF0','\xFFFD'
-        )
-        ,
-        InRangeU(
-            "\U00010000", "\U000EFFFF"
-        )
-    );
-    /// <summary>
-    /// PN_CHARS_U ::= PN_CHARS_BASE |  '_' 
-    /// </summary>
-    static readonly Func<Production> PN_CHARS_U = () => AnyOf(PN_CHARS_BASE, '_');
-    /// <summary>
-    /// PN_CHARS ::= PN_CHARS_U |  '-' |  [0-9] |  #x00B7 |  [#x0300-#x036F] |  [#x203F-#x2040] 
-    /// </summary>
-    static readonly Func<Production> PN_CHARS = () => AnyOf(PN_CHARS_U, '-', DIGIT, '\x00B7', InRange('\x0300','\x036F',  '\x203F','\x2040'));
-    /// <summary>
-    /// PN_PREFIX ::= PN_CHARS_BASE ((PN_CHARS |  '.')* PN_CHARS)? 
-    /// </summary>
-    static readonly Func<Production> PN_PREFIX = () => All(PN_CHARS_BASE, Optional(ZeroOrMore(AnyOf(PN_CHARS, '.')), PN_CHARS));
-    /// <summary>
-    /// PN_LOCAL ::= (PN_CHARS_U |  ':' |  [0-9] |  PLX) ((PN_CHARS |  '.' |  ':' |  PLX)* (PN_CHARS |  ':' |  PLX))? 
-    /// </summary>
-    static readonly Func<Production> PN_LOCAL = () => All( AnyOf(PN_CHARS_U, ':', DIGIT, PLX), Optional(ZeroOrMore(AnyOf(PN_CHARS, '.', ':', PLX)), AnyOf(PN_CHARS, ':', PLX)) );
-    /// <summary>
-    /// PLX ::= PERCENT |  PN_LOCAL_ESC 
-    /// </summary>
-    static readonly Func<Production> PLX = () => AnyOf(PERCENT, PN_LOCAL_ESC);
-    /// <summary>
-    /// PERCENT ::= '%' HEX HEX 
-    /// </summary>
-    static readonly Func<Production> PERCENT = () => All('%', HEX, HEX);
-    /// <summary>
-    /// HEX ::= [0-9] |  [A-F] |  [a-f] 
-    /// </summary>
-    static readonly Func<Production> HEX = () => AnyOf(DIGIT,InRange('A', 'F'), InRange('a', 'f'));
-    /// <summary>
-    /// PN_LOCAL_ESC ::= '\' ('_' |  '~' |  '.' |  '-' |  '!' |  '$' |  '&' |  "'" |  '(' |  ')' |  '*' |  '+' |  ',' |  ';' |  '=' |  '/' |  '?' |  '#' |  '@' |  '%') 
-    /// </summary>
-    static readonly Func<Production> PN_LOCAL_ESC = () => All('\\', In('_', '~', '.', '-', '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=', '/', '?','#', '@', '%'));
+        /// <summary>
+        /// PN_CHARS_BASE ::= [A-Z] |  [a-z] |  [#x00C0-#x00D6] |  [#x00D8-#x00F6] |  [#x00F8-#x02FF] |  [#x0370-#x037D] |  
+        ///                                     [#x037F-#x1FFF] |  [#x200C-#x200D] |  [#x2070-#x218F] |  [#x2C00-#x2FEF] |  
+        ///                                     [#x3001-#xD7FF] |  [#xF900-#xFDCF] |  [#xFDF0-#xFFFD] |  [#x10000-#xEFFFF] 
+        /// </summary>
+        static readonly Func<Production> PN_CHARS_BASE = () => AnyOf(
+            InRange(
+                'A', 'Z',
+                'a', 'z',
+                '\x00C0', '\x00D6',
+                '\x00D8', '\x00F6',
+                '\x00F8', '\x02FF',
+                '\x037F', '\x1FFF',
+                '\x200C', '\x200D',
+                '\x2070', '\x218F',
+                '\x2C00', '\x2FEF',
+                '\x3001', '\xD7FF',
+                '\xF900', '\xFDCF',
+                '\xFDF0', '\xFFFD'
+            )
+            ,
+            InRangeU(
+                "\U00010000", "\U000EFFFF"
+            )
+        );
+        /// <summary>
+        /// PN_CHARS_U ::= PN_CHARS_BASE |  '_' 
+        /// </summary>
+        static readonly Func<Production> PN_CHARS_U = () => AnyOf(PN_CHARS_BASE, '_');
+        /// <summary>
+        /// PN_CHARS ::= PN_CHARS_U |  '-' |  [0-9] |  #x00B7 |  [#x0300-#x036F] |  [#x203F-#x2040] 
+        /// </summary>
+        static readonly Func<Production> PN_CHARS = () => AnyOf(PN_CHARS_U, '-', DIGIT, '\x00B7', InRange('\x0300', '\x036F', '\x203F', '\x2040'));
+        /// <summary>
+        /// PN_PREFIX ::= PN_CHARS_BASE ((PN_CHARS |  '.')* PN_CHARS)? 
+        /// </summary>
+        static readonly Func<Production> PN_PREFIX = () => All(PN_CHARS_BASE, Optional(ZeroOrMore(AnyOf(PN_CHARS, '.')), PN_CHARS));
+        /// <summary>
+        /// PN_LOCAL ::= (PN_CHARS_U |  ':' |  [0-9] |  PLX) ((PN_CHARS |  '.' |  ':' |  PLX)* (PN_CHARS |  ':' |  PLX))? 
+        /// </summary>
+        static readonly Func<Production> PN_LOCAL = () => All(AnyOf(PN_CHARS_U, ':', DIGIT, PLX), Optional(ZeroOrMore(AnyOf(PN_CHARS, '.', ':', PLX)), AnyOf(PN_CHARS, ':', PLX)));
+        /// <summary>
+        /// PLX ::= PERCENT |  PN_LOCAL_ESC 
+        /// </summary>
+        static readonly Func<Production> PLX = () => AnyOf(PERCENT, PN_LOCAL_ESC);
+        /// <summary>
+        /// PERCENT ::= '%' HEX HEX 
+        /// </summary>
+        static readonly Func<Production> PERCENT = () => All('%', HEX, HEX);
+        /// <summary>
+        /// HEX ::= [0-9] |  [A-F] |  [a-f] 
+        /// </summary>
+        static readonly Func<Production> HEX = () => AnyOf(DIGIT, InRange('A', 'F'), InRange('a', 'f'));
+        /// <summary>
+        /// PN_LOCAL_ESC ::= '\' ('_' |  '~' |  '.' |  '-' |  '!' |  '$' |  '&' |  "'" |  '(' |  ')' |  '*' |  '+' |  ',' |  ';' |  '=' |  '/' |  '?' |  '#' |  '@' |  '%') 
+        /// </summary>
+        static readonly Func<Production> PN_LOCAL_ESC = () => All('\\', In('_', '~', '.', '-', '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=', '/', '?', '#', '@', '%'));
 
-    #endregion
+        #endregion
 
-    #region Grammar Production Rules
+        #region Grammar Production Rules
 
-    /// <summary>
-    /// Applies blank subject allocation.
-    /// </summary>
-    static readonly Func<Production> @AllocBlankSubject = () => Call((producer, names) => producer.AllocBlankSubject());
+        /// <summary>
+        /// Applies blank subject allocation.
+        /// </summary>
+        static readonly Func<Production> @AllocBlankSubject = () => Call((producer, names) => producer.AllocBlankSubject());
 
-    /// <summary>
-    /// Applies blank object allocation.
-    /// </summary>
-    static readonly Func<Production> @AllocBlankObject = () => Call((producer, names) => producer.AllocBlankObject());
+        /// <summary>
+        /// Applies blank object allocation.
+        /// </summary>
+        static readonly Func<Production> @AllocBlankObject = () => Call((producer, names) => producer.AllocBlankObject());
 
-    /// <summary>
-    /// Applies a scoped property list beginning.
-    /// </summary>
-    static readonly Func<Production> @BeginPropertyList = () => Call((producer, names) => producer.BeginPropertyList());
+        /// <summary>
+        /// Applies a scoped property list beginning.
+        /// </summary>
+        static readonly Func<Production> @BeginPropertyList = () => Call((producer, names) => producer.BeginPropertyList());
 
-    /// <summary>
-    /// Applies a scoped property list ending.
-    /// </summary>
-    static readonly Func<Production> @EndPropertyList = () => Call((producer, names) => producer.EndPropertyList());
+        /// <summary>
+        /// Applies a scoped property list ending.
+        /// </summary>
+        static readonly Func<Production> @EndPropertyList = () => Call((producer, names) => producer.EndPropertyList());
 
-    /// <summary>
-    /// Applies a scoped object list beginning.
-    /// </summary>
-    static readonly Func<Production> @BeginCollection = () => Call((producer, names) => producer.BeginCollection());
+        /// <summary>
+        /// Applies a scoped object list beginning.
+        /// </summary>
+        static readonly Func<Production> @BeginCollection = () => Call((producer, names) => producer.BeginCollection());
 
-    /// <summary>
-    /// Applies a scoped object list ending.
-    /// </summary>
-    static readonly Func<Production> @EndCollection = () => Call((producer, names) => producer.EndCollection());
+        /// <summary>
+        /// Applies a scoped object list ending.
+        /// </summary>
+        static readonly Func<Production> @EndCollection = () => Call((producer, names) => producer.EndCollection());
 
-    /// <summary>
-    /// Applies a base declaration.
-    /// </summary>
-    static readonly Func<Production> @Base = () => Call((producer, names) => producer.Base = names["base.node.iri"]);
+        /// <summary>
+        /// Applies a base declaration.
+        /// </summary>
+        static readonly Func<Production> @Base = () => Call((producer, names) => producer.Base = names["base.node.iri"]);
 
-    /// <summary>
-    /// Applies a prefix declaration.
-    /// </summary>
-    static readonly Func<Production> @PrefixAndNamespace = () => Call((producer, names) => producer.PrefixAndNamespace(names["prefix.name"], names["namespace.node.iri"]));
+        /// <summary>
+        /// Applies a prefix declaration.
+        /// </summary>
+        static readonly Func<Production> @PrefixAndNamespace = () => Call((producer, names) => producer.PrefixAndNamespace(names["prefix.name"], names["namespace.node.iri"]));
 
-    /// <summary>
-    /// Applies a subject term.
-    /// </summary>
-    static readonly Func<Production> @Subject = () => Call((producer, names) => producer.Subject = names["subject.node"]);
+        /// <summary>
+        /// Applies a subject term.
+        /// </summary>
+        static readonly Func<Production> @Subject = () => Call((producer, names) => producer.Subject = names["subject.node"]);
 
-    /// <summary>
-    /// Applies a predicate term.
-    /// </summary>
-    static readonly Func<Production> @Predicate = () => Call((producer, names) => producer.Predicate = names["predicate.node"]);
+        /// <summary>
+        /// Applies a predicate term.
+        /// </summary>
+        static readonly Func<Production> @Predicate = () => Call((producer, names) => producer.Predicate = names["predicate.node"]);
 
-    /// <summary>
-    /// Applies an object term.
-    /// </summary>
-    static readonly Func<Production> @Object = () => Call((producer, names) => producer.Object = names["object.node"]);
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Boolean = () => Call((producer, names) => producer.TermIsBoolean());
+        /// <summary>
+        /// Applies an object term.
+        /// </summary>
+        static readonly Func<Production> @Object = () => Call((producer, names) => producer.Object = names["object.node"]);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Integer = () => Call((producer, names) => producer.TermIsInteger());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Boolean = () => Call((producer, names) => producer.TermIsBoolean());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Double = () => Call((producer, names) => producer.TermIsDouble());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Integer = () => Call((producer, names) => producer.TermIsInteger());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Decimal = () => Call((producer, names) => producer.TermIsDecimal());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Double = () => Call((producer, names) => producer.TermIsDouble());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Iri = () => Call((producer, names) => producer.TermIsIri());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Decimal = () => Call((producer, names) => producer.TermIsDecimal());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Blank = () => Call((producer, names) => producer.TermIsBlank());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Iri = () => Call((producer, names) => producer.TermIsIri());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Anon = () => Call((producer, names) => producer.TermIsAnon());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Blank = () => Call((producer, names) => producer.TermIsBlank());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @Nil = () => Call((producer, names) => producer.TermIsNil());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Anon = () => Call((producer, names) => producer.TermIsAnon());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @String = () => Call((producer, names) => producer.TermIsString());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @Nil = () => Call((producer, names) => producer.TermIsNil());
 
-    /// <summary>
-    /// 
-    /// </summary>
-    static readonly Func<Production> @A = () => Call((producer, names) => producer.TermIsA());
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @String = () => Call((producer, names) => producer.TermIsString());
+
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> @A = () => Call((producer, names) => producer.TermIsA());
+
+    }
 
     #endregion
 
@@ -481,7 +485,7 @@ public partial class Turtle : Parser<Turtle.Producer>
     /// Creates the turtle parsing singleton.
     /// </summary>
     private Turtle()
-        : base(turtleDoc)
+        : base(Productions.turtleDoc)
     {
     }
 
