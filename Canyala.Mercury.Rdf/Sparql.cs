@@ -127,7 +127,7 @@ public class Sparql : Parser<Query.Builder>
         static readonly Func<Production> Query = () => _(nameof(Query), All(Prologue, CUT, AnyOf(SelectQuery, ConstructQuery, DescribeQuery, AskQuery), CUT, ValuesClause));
 
         // [3] ROOT! UpdateUnit	  ::=  	Update
-        public static readonly Func<Production> UpdateUnit = () => Update;
+        public static readonly Func<Production> UpdateUnit = () => _(nameof(UpdateUnit), Update);
 
         // [4]  	Prologue	  ::=  	( BaseDecl | PrefixDecl )*
         static readonly Func<Production> Prologue = () => ZeroOrMore(AnyOf(BaseDecl, PrefixDecl));
