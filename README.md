@@ -4,7 +4,7 @@ It began as an experiment to find out if it was possible to declare BNF in C# wi
 The same basic Parser base class is used to implement both terse turtle and sparql engines.
 An other interesting candidate for a Mercury Parser based implementation is Lua script.
 
-Mercury is the roman name of the greek god hermes, who has winged feet and delivers information. Mercury was also the name of the initial NASA program.
+Mercury is the roman name of the greek god Hermes, who has winged feet and delivers information. Mercury was also the name of the initial NASA program.
 
 ## 2023-02-17
 - Builds OK, all tests OK, moved sparql production lamdbas into an inner private Productions class to create a scope for the production rules.
