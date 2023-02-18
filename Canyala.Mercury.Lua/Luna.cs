@@ -27,17 +27,17 @@
 using System;
 using Canyala.Mercury.Core.Text;
 
-namespace Canyala.Mercury.Lua;
+namespace Canyala.Mercury.Luna;
 
 /// <summary>
-/// Implements a parser for Lua script.
+/// Implements a .NET parser for Lua script.
 /// </summary>
 /// <remarks>
 /// The Lua class is partial because the inner Lua.Producer class is implemented in
 /// its own file, Lua.Producer.cs
 /// </remarks>
-/// <seealso cref=""/>
-public partial class Lua : Parser<Lua.Producer>
+/// <seealso cref="https://www.lua.org"/>
+public partial class Lua : Parser<Luna.Producer>
 {
     #region Grammar Production Declarations
 

@@ -39,17 +39,17 @@ using Canyala.Lagoon.Core.Functional;
 using Canyala.Mercury.Core;
 using Canyala.Mercury.Core.Text;
 
-namespace Canyala.Mercury.Lua;
+namespace Canyala.Mercury.Luna;
 
 /// <summary>
-/// Implements a parser for Lua script.
+/// Implements a code producer for running Luna scripts on the .NET CORE CLR.
 /// </summary>
 /// <remarks>
-/// This class is partial because the inner Lua.Producer class is implemented in
-/// this file, the Lua class is implemented in Lua.cs.
+/// This class is partial because the inner Luna.Producer class is implemented in
+/// this file, the Luna class is implemented in Luna.cs.
 /// </remarks>
 /// <seealso cref=""/>
-public partial class Lua
+public partial class Luna
 {
     public class Producer : IEnumerable<string[]>, IDisposable
     {
@@ -59,11 +59,11 @@ public partial class Lua
         #region Construction
 
         /// <summary>
-        /// Create a turtle producer.
+        /// Create a Luna producer.
         /// </summary>
         /// <param name="parser">The turtle parse instance.</param>
         /// <param name="turtleLines">A turtle document as a sequence of text line strings.</param>
-        internal Producer(Lua parser, IEnumerable<string> luaLines)
+        internal Producer(Luna parser, IEnumerable<string> luaLines)
         {
             /*
             Emitters.Push(DefaultEmitter);
