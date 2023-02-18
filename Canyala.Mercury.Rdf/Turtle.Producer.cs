@@ -279,8 +279,6 @@ public partial class Turtle
 
         #region Special Term Resolvers
 
-        #region Special Term Resolvers
-
         Func<string, Resource> CreateTerm = UndefinedTerm;
 
         internal void TermIsBoolean()
@@ -348,8 +346,6 @@ public partial class Turtle
 
         private Resource NewBlank()
         { return Rdf.Blank.NewBlank(); }
-
-        #endregion
 
         #endregion
 

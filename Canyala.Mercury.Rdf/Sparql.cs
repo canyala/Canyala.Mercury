@@ -47,6 +47,7 @@ namespace Canyala.Mercury.Rdf;
 /// Class to apply a SPARQL query text to a Rdf.Query object.
 /// instance.
 /// </summary>
+/// <seealso cref="https://www.w3.org/TR/sparql11-query/"/>
 public class Sparql : Parser<Query.Builder>
 {
     #region Public API
@@ -119,9 +120,10 @@ public class Sparql : Parser<Query.Builder>
     */
 
     /// <summary>
-    /// Productions declare sparql production rules
-    /// based on the bnf grammar section at https://www.w3.org/TR/sparql11-query/#grammar
+    /// The inner Productions class declare sparql production rules
+    /// based on the sparql bnf grammar.
     /// </summary>
+    /// <seealso cref="https://www.w3.org/TR/sparql11-query/#grammar"/>
     private class Productions
     {
         // [1] ROOT! QueryUnit	  ::=  	Query
@@ -1392,8 +1394,7 @@ public class Sparql : Parser<Query.Builder>
     /// <param name="text">SPARQL text.</param>
     private Sparql()
         : base(Productions.QueryUnit)
-    {
-    }
+    { /* No implementation */ }
 
     #endregion
 }

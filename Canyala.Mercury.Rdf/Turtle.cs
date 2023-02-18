@@ -46,7 +46,7 @@ namespace Canyala.Mercury.Rdf;
 /// Terse RDF Triple Language
 /// W3C Candidate Recommendation 19 February 2013
 /// </remarks>
-/// <seealso cref="http://www.w3.org/TR/2013/CR-turtle-20130219/"/>
+/// <seealso cref="https://www.w3.org/TR/turtle/"/>
 public partial class Turtle : Parser<Turtle.Producer>
 {
     #region Public API
@@ -148,9 +148,10 @@ public partial class Turtle : Parser<Turtle.Producer>
     #region Grammar Production Declarations
 
     /// <summary>
-    /// Productions declare terse turtle production rules
-    /// based on the bnf grammar section at https://www.w3.org/TR/turtle/#sec-grammar
+    /// The inner Productions class declare terse turtle production rules
+    /// based on the terse turtle bnf grammar.
     /// </summary>
+    /// <seealso cref="https://www.w3.org/TR/turtle/#sec-grammar"/>
     private class Productions
     {
         /// <summary>
@@ -488,8 +489,7 @@ public partial class Turtle : Parser<Turtle.Producer>
     /// </summary>
     private Turtle()
         : base(Productions.turtleDoc)
-    {
-    }
+    { /* No implementation */ }
 
     #endregion
 }

@@ -702,19 +702,19 @@ public abstract class Parser<T>
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="productions"></param>
-    /// <returns></returns>
-    protected static Production All(params Production[] productions)
-        { return new Production.All(productions); }
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="trace"></param>
     /// <param name="production"></param>
     /// <returns></returns>
     protected static Production _(string trace, Production production)
-        { return new Production.Trace(trace, production); }
+    { return new Production.Trace(trace, production); }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="productions"></param>
+    /// <returns></returns>
+    protected static Production All(params Production[] productions)
+        { return new Production.All(productions); }
 
     /// <summary>
     /// 
