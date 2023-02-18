@@ -25,7 +25,9 @@
 */
 
 using System;
+using System.Xml.Linq;
 using Canyala.Mercury.Core.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Canyala.Mercury.Luna;
 
@@ -33,43 +35,127 @@ namespace Canyala.Mercury.Luna;
 /// Implements a .NET parser for Lua script.
 /// </summary>
 /// <remarks>
-/// The Lua class is partial because the inner Lua.Producer class is implemented in
-/// its own file, Lua.Producer.cs
+/// The Luna class is partial because the inner Luna.Producer class is implemented in
+/// its own file, Luna.Producer.cs
 /// </remarks>
 /// <seealso cref="https://www.lua.org"/>
-public partial class Lua : Parser<Luna.Producer>
+public partial class Luna : Parser<Luna.Producer>
 {
     #region Grammar Production Declarations
 
     // <summary>
     /// Productions declare Lua production rules
-    /// based on the bnf grammar section at TBD
+    /// based on the Lua bnf grammar.
     /// </summary>
+    /// <seealso cref="https://www.lua.org/manual/5.4/manual.html#9"/>
     private class Productions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly Func<Production> luaDoc = () => _(nameof(luaDoc), NotImplemented);
+        static readonly Func<Production> @NotImplemented = () => Call((_, _) => throw new NotImplementedException());
 
         /// <summary>
-        /// 
+        /// chunk ::= block
         /// </summary>
-        static readonly Func<Production> @NotImplemented = () => Call((_, _) => throw new NotImplementedException());
+        public static readonly Func<Production> chunk = () => _(nameof(chunk), block);
+        /// <summary>
+        /// block ::= { stat } [retstat]
+        /// </summary>
+        static readonly Func<Production> block = () => _(nameof(block), All(ZeroOrMore(stat), Optional(retstat)));
+
+        /*
+        stat::=  ‘;’ | varlist ‘=’ explist | 
+		 functioncall | 
+		 label | 
+		 break | 
+		 goto Name | 
+		 do block end | 
+		 while exp do block end | 
+
+         repeat block until exp | 
+		 if exp then block {elseif exp then block}
+    [else block] end | 
+		 for Name ‘=’ exp ‘,’ exp[‘,’ exp] do block end | 
+		 for namelist in explist do block end | 
+
+         function funcname funcbody | 
+		 local function Name funcbody | 
+
+         local attnamelist[‘=’ explist]
+        */
+        static readonly Func<Production> stat = () => _(nameof(stat), @NotImplemented);
+        /*
+    attnamelist::=  Name attrib {‘,’ Name attrib }
+
+    attrib::= [‘<’ Name ‘>’]
+        */
+
+        /// <summary>
+        /// retstat::= return [explist] [‘;’]
+        /// </summary>
+        static readonly Func<Production> retstat = () => _(nameof(retstat), @NotImplemented);
+    /*
+    label::= ‘::’ Name ‘::’
+
+	funcname::= Name {‘.’ Name
+}
+[‘:’ Name]
+
+varlist::= var {‘,’ var}
+
+	var::= Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
+
+    namelist ::= Name {‘,’ Name}
+
+explist::= exp {‘,’ exp}
+
+exp::= nil | false | true | Numeral | LiteralString | ‘...’ | functiondef |
+     prefixexp | tableconstructor | exp binop exp | unop exp 
+
+	prefixexp ::= var | functioncall | ‘(’ exp ‘)’
+
+	functioncall::= prefixexp args | prefixexp ‘:’ Name args 
+
+	args ::=  ‘(’ [explist] ‘)’ | tableconstructor | LiteralString
+
+
+    functiondef::= function funcbody
+
+    funcbody ::= ‘(’ [parlist] ‘)’ block end
+
+	parlist ::= namelist [‘,’ ‘...’] | ‘...’
+
+	tableconstructor::= ‘{’ [fieldlist] ‘}’
+
+	fieldlist::= field { fieldsep field}
+[fieldsep]
+
+//field::= ‘[’ exp ‘]’ ‘=’ exp | Name ‘=’ exp | exp
+
+
+    //fieldsep::= ‘,’ | ‘;’
+
+	//binop::=  ‘+’ | ‘-’ | ‘*’ | ‘/’ | ‘//’ | ‘^’ | ‘%’ | 
+	//	 ‘&’ | ‘~’ | ‘|’ | ‘>>’ | ‘<<’ | ‘..’ |
+	//	 ‘<’ | ‘<=’ | ‘>’ | ‘>=’ | ‘==’ | ‘~=’ |
+    //     and | or
+
+        */
+        //unop ::= ‘-’ | not | ‘#’ | ‘~’
+        static readonly Func<Production> unop = () => AnyOf('-', "not", '#', '~');
     }
 
     #endregion
 
     #region Internal Construction
 
-    private static readonly Lua Instance = new Lua();
+    private static readonly Luna Instance = new Luna();
 
     /// <summary>
-    /// Creates the Lua parsing singleton.
+    /// Creates the Luna parsing singleton.
     /// </summary>
-    private Lua()
-        : base(Productions.luaDoc)
-    { /* No implementation */ }
+    private Luna()
+        : base(Productions.chunk)
+    { /* No implementation */
+    }
 
     #endregion
 }

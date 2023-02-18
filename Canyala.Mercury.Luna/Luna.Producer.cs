@@ -48,7 +48,7 @@ namespace Canyala.Mercury.Luna;
 /// This class is partial because the inner Luna.Producer class is implemented in
 /// this file, the Luna class is implemented in Luna.cs.
 /// </remarks>
-/// <seealso cref=""/>
+/// <seealso cref="https://www.lua.org/"/>
 public partial class Luna
 {
     public class Producer : IEnumerable<string[]>, IDisposable
