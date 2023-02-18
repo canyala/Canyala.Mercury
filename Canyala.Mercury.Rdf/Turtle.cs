@@ -158,66 +158,82 @@ public partial class Turtle : Parser<Turtle.Producer>
         /// ROOT! turtleDoc ::= statement* 
         /// </summary>
         public static readonly Func<Production> turtleDoc = () => _(nameof(turtleDoc), All(ZeroOrMore(statement)));
+
         /// <summary>
         /// statement ::= directive |  triples '.'     
         /// </summary>
         static readonly Func<Production> statement = () => AnyOf(directive, All(triples, '.'));
+
         /// <summary>
         /// directive ::= prefixID |  base |  sparqlPrefix |  sparqlBase 
         /// </summary>
         static readonly Func<Production> directive = () => AnyOf(prefixID, _base, sparqlPrefix, sparqlBase);
+
         /// <summary>
         /// prefixID ::= '@prefix' PNAME_NS IRIREF '.' 
         /// </summary>
         static readonly Func<Production> prefixID = () => All("@prefix", Named("prefix", PNAME_NS), Named("namespace", IRIREF), '.', @PrefixAndNamespace);
+
         /// <summary>
         /// base ::= '@base' IRIREF '.' 
         /// </summary>
         static readonly Func<Production> _base = () => All("@base", Named("base", IRIREF), '.', @Base);
+
         /// <summary>
         /// sparqlBase ::= "BASE" IRIREF 
         /// </summary>
         static readonly Func<Production> sparqlBase = () => All(i("BASE"), All(Named("base", IRIREF), @Base));
+
         /// <summary>
         /// sparqlPrefix ::= "PREFIX" PNAME_NS IRIREF 
         /// </summary>
         static readonly Func<Production> sparqlPrefix = () => All(i("PREFIX"), Named("prefix", PNAME_NS), Named("namespace", IRIREF), @PrefixAndNamespace);
+
         /// <summary>
         /// triples ::= subject predicateObjectList |  blankNodePropertyList predicateObjectList? 
         /// </summary>
         static readonly Func<Production> triples = () => _(nameof(triples), AnyOf(All(subject, predicateObjectList), All(@AllocBlankSubject, blankNodePropertyList, Optional(predicateObjectList))));
+
         /// <summary>
         /// predicateObjectList ::= verb objectList (';' (verb objectList)?)* 
         /// </summary>
         static readonly Func<Production> predicateObjectList = () => _(nameof(predicateObjectList), All(verb, objectList, ZeroOrMore(';', Optional(verb, objectList))));
+
         /// <summary>
         /// objectList ::= object (',' object)* 
         /// </summary>
         static readonly Func<Production> objectList = () => _(nameof(objectList), All(_object, ZeroOrMore(',', _object)));
+
         /// <summary>
         /// verb ::= predicate |  'a' 
         /// </summary>
         static readonly Func<Production> verb = () => _(nameof(verb), All(Named("predicate", AnyOf(predicate, All(@A, Named("node", 'a')))), @Predicate));
+
         /// <summary>
         /// subject ::= iri |  BlankNode |  collection 
         /// </summary>
         static readonly Func<Production> subject = () => _(nameof(subject), All(AnyOf(Named("subject", All(@Iri, iri)), Named("subject", BlankNode), All(@AllocBlankSubject, collection)), @Subject));
+
         /// <summary>
         /// predicate ::= iri 
         /// </summary>
         static readonly Func<Production> predicate = () => _(nameof(predicate), All(@Iri, iri));
+
         /// <summary>
         /// object ::= collection |  blankNodePropertyList | iri | BlankNode | literal
         /// </summary>
         static readonly Func<Production> _object = () => _("object", AnyOf(AnyOf(All(@AllocBlankObject, collection), All(@AllocBlankObject, blankNodePropertyList)), All(Named("object", AnyOf(All(@Iri, iri), BlankNode, literal)), @Object)));
+
         /// <summary>
         /// literal ::= RDFLiteral |  NumericLiteral |  BooleanLiteral 
         /// </summary>
         static readonly Func<Production> literal = () => _(nameof(literal), Named("node", AnyOf(RDFLiteral, NumericLiteral, BooleanLiteral)));
+
         /// <summary>
         /// blankNodePropertyList ::= '[' predicateObjectList ']' 
         /// </summary>
         static readonly Func<Production> blankNodePropertyList = () => _(nameof(blankNodePropertyList), All(@BeginPropertyList, '[', predicateObjectList, ']', @EndPropertyList));
+
         /// <summary>
         /// collection ::= '(' object* ')' 
         /// </summary>
@@ -229,22 +245,27 @@ public partial class Turtle : Parser<Turtle.Producer>
         /// NumericLiteral ::= INTEGER |  DECIMAL |  DOUBLE 
         /// </summary>
         static readonly Func<Production> NumericLiteral = () => _(nameof(NumericLiteral), Token(AnyOf(All(@Double, DOUBLE), All(@Decimal, DECIMAL), All(@Integer, INTEGER))));
+
         /// <summary>
         /// RDFLiteral ::= String (LANGTAG |  '^^' iri)? 
         /// </summary>
         static readonly Func<Production> RDFLiteral = () => _(nameof(RDFLiteral), Token(_String, Optional(AnyOf(LANGTAG, All("^^", iri)))));
+
         /// <summary>
         /// BooleanLiteral ::= 'true' |  'false' 
         /// </summary>
         static readonly Func<Production> BooleanLiteral = () => _(nameof(BooleanLiteral), Token(@Boolean, AnyOf("true", "false")));
+
         /// <summary>
         /// String ::= STRING_LITERAL_QUOTE |  STRING_LITERAL_SINGLE_QUOTE |  STRING_LITERAL_LONG_SINGLE_QUOTE |  STRING_LITERAL_LONG_QUOTE 
         /// </summary>
         static readonly Func<Production> _String = () => _(nameof(String), Token(@String, AnyOf(STRING_LITERAL_QUOTE, STRING_LITERAL_SINGLE_QUOTE, STRING_LITERAL_LONG_SINGLE_QUOTE, STRING_LITERAL_LONG_QUOTE)));
+
         /// <summary>
         /// PrefixedName ::= PNAME_LN |  PNAME_NS 
         /// </summary>
         static readonly Func<Production> PrefixedName = () => _(nameof(PrefixedName), Token(AnyOf(PNAME_LN, PNAME_NS)));
+
         /// <summary>
         /// BlankNode ::= BLANK_NODE_LABEL |  ANON 
         /// </summary>
@@ -256,50 +277,62 @@ public partial class Turtle : Parser<Turtle.Producer>
         /// iri ::= IRIREF |  PrefixedName 
         /// </summary>
         static readonly Func<Production> iri = () => AnyOf(IRIREF, PrefixedName);
+
         /// <summary>
         /// IRIREF ::= '<' ([^#x00-#x20<>\"{}|^`\] |  UCHAR)* '>' 
         /// </summary>
         static readonly Func<Production> IRIREF = () => Named("node", All('<', Named("iri", ZeroOrMore(AnyOf(NotIn(Seq.Of('^', '<', '>', '"', '{', '}', '|', '\\', '´').Concat('\x00'.UpTo('\x20'))), UCHAR))), '>'));
+
         /// <summary>
         /// PNAME_NS ::= PN_PREFIX? ':' 
         /// </summary>
         static readonly Func<Production> PNAME_NS = () => All(Named("name", Optional(PN_PREFIX)), ':');
+
         /// <summary>
         /// PNAME_LN ::= PNAME_NS PN_LOCAL 
         /// </summary>
         static readonly Func<Production> PNAME_LN = () => Named("node", All(PNAME_NS, PN_LOCAL));
+
         /// <summary>
         /// BLANK_NODE_LABEL ::= '_:' (PN_CHARS_U |  [0-9]) ((PN_CHARS |  '.')* PN_CHARS)? 
         /// </summary>
         static readonly Func<Production> BLANK_NODE_LABEL = () => All("_:", AnyOf(PN_CHARS_U, InRange('0', '9')), Optional(ZeroOrMore(AnyOf(PN_CHARS, '.'), PN_CHARS)));
+
         /// <summary>
         /// LANGTAG ::= '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)* 
         /// </summary>
         static readonly Func<Production> LANGTAG = () => _(nameof(LANGTAG), All('@', OneOrMore(LETTER), ZeroOrMore('-', OneOrMore(DIGIT_OR_LETTER))));
+
         /// <summary>
         /// STRING_LITERAL_QUOTE ::= '"' ([^#x22#x5C#xA#xD] |  ECHAR |  UCHAR)* '"' 
         /// </summary>
         static readonly Func<Production> STRING_LITERAL_QUOTE = () => All('"', ZeroOrMore(AnyOf(NotIn('\x22', '\x5C', '\xA', '\xD'), ECHAR, UCHAR)), '"');
+
         /// <summary>
         /// STRING_LITERAL_SINGLE_QUOTE ::= "'" ([^#x27#x5C#xA#xD] |  ECHAR |  UCHAR)* "'" 
         /// </summary>
         static readonly Func<Production> STRING_LITERAL_SINGLE_QUOTE = () => All("'", ZeroOrMore(AnyOf(NotIn('\x27', '\x5C', '\xA', '\xD'), ECHAR, UCHAR)), "'");
+
         /// <summary>
         /// STRING_LITERAL_LONG_SINGLE_QUOTE ::= "'''" (("'" |  "''")? [^'\] |  ECHAR |  UCHAR)* "'''" 
         /// </summary>
         static readonly Func<Production> STRING_LITERAL_LONG_SINGLE_QUOTE = () => All("'''", ZeroOrMore(AnyOf(All(Optional(AnyOf("'", "''")), NotIn('\'', '\\')), ECHAR, UCHAR)), "'''");
+
         /// <summary>
         /// STRING_LITERAL_LONG_QUOTE ::= '"""' (('"' |  '""')? [^"\] |  ECHAR |  UCHAR)* '"""' 
         /// </summary>
         static readonly Func<Production> STRING_LITERAL_LONG_QUOTE = () => All("\"\"\"", ZeroOrMore(AnyOf(All(Optional(AnyOf("\"", "\"\"")), NotIn('"', '\\')), ECHAR, UCHAR)), "\"\"\"");
+
         /// <summary>
         /// UCHAR ::= '\u' HEX HEX HEX HEX |  '\U' HEX HEX HEX HEX HEX HEX HEX HEX 
         /// </summary>
         static readonly Func<Production> UCHAR = () => AnyOf(All("\\u", HEX, HEX, HEX, HEX), All("\\U", HEX, HEX, HEX, HEX, HEX, HEX, HEX, HEX));
+
         /// <summary>
         /// ECHAR ::= '\' [tbnrf\"'] 
         /// </summary>
         static readonly Func<Production> ECHAR = () => All('\\', In('t', 'b', 'n', 'r', 'f', '\\', '\"', '\''));
+
         /// <summary>
         /// ANON ::= '[' WS* ']' 
         /// </summary>
@@ -332,34 +365,42 @@ public partial class Turtle : Parser<Turtle.Producer>
                 "\U00010000", "\U000EFFFF"
             )
         );
+
         /// <summary>
         /// PN_CHARS_U ::= PN_CHARS_BASE |  '_' 
         /// </summary>
         static readonly Func<Production> PN_CHARS_U = () => AnyOf(PN_CHARS_BASE, '_');
+
         /// <summary>
         /// PN_CHARS ::= PN_CHARS_U |  '-' |  [0-9] |  #x00B7 |  [#x0300-#x036F] |  [#x203F-#x2040] 
         /// </summary>
         static readonly Func<Production> PN_CHARS = () => AnyOf(PN_CHARS_U, '-', DIGIT, '\x00B7', InRange('\x0300', '\x036F', '\x203F', '\x2040'));
+
         /// <summary>
         /// PN_PREFIX ::= PN_CHARS_BASE ((PN_CHARS |  '.')* PN_CHARS)? 
         /// </summary>
         static readonly Func<Production> PN_PREFIX = () => All(PN_CHARS_BASE, Optional(ZeroOrMore(AnyOf(PN_CHARS, '.')), PN_CHARS));
+
         /// <summary>
         /// PN_LOCAL ::= (PN_CHARS_U |  ':' |  [0-9] |  PLX) ((PN_CHARS |  '.' |  ':' |  PLX)* (PN_CHARS |  ':' |  PLX))? 
         /// </summary>
         static readonly Func<Production> PN_LOCAL = () => All(AnyOf(PN_CHARS_U, ':', DIGIT, PLX), Optional(ZeroOrMore(AnyOf(PN_CHARS, '.', ':', PLX)), AnyOf(PN_CHARS, ':', PLX)));
+
         /// <summary>
         /// PLX ::= PERCENT |  PN_LOCAL_ESC 
         /// </summary>
         static readonly Func<Production> PLX = () => AnyOf(PERCENT, PN_LOCAL_ESC);
+
         /// <summary>
         /// PERCENT ::= '%' HEX HEX 
         /// </summary>
         static readonly Func<Production> PERCENT = () => All('%', HEX, HEX);
+
         /// <summary>
         /// HEX ::= [0-9] |  [A-F] |  [a-f] 
         /// </summary>
         static readonly Func<Production> HEX = () => AnyOf(DIGIT, InRange('A', 'F'), InRange('a', 'f'));
+
         /// <summary>
         /// PN_LOCAL_ESC ::= '\' ('_' |  '~' |  '.' |  '-' |  '!' |  '$' |  '&' |  "'" |  '(' |  ')' |  '*' |  '+' |  ',' |  ';' |  '=' |  '/' |  '?' |  '#' |  '@' |  '%') 
         /// </summary>

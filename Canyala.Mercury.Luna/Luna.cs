@@ -32,7 +32,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Canyala.Mercury.Luna;
 
 /// <summary>
-/// Implements a .NET parser for Lua script.
+/// Implements a .NET parser for Lua scripts.
 /// </summary>
 /// <remarks>
 /// The Luna class is partial because the inner Luna.Producer class is implemented in
@@ -56,91 +56,148 @@ public partial class Luna : Parser<Luna.Producer>
         /// chunk ::= block
         /// </summary>
         public static readonly Func<Production> chunk = () => _(nameof(chunk), block);
+
         /// <summary>
         /// block ::= { stat } [retstat]
         /// </summary>
         static readonly Func<Production> block = () => _(nameof(block), All(ZeroOrMore(stat), Optional(retstat)));
 
-        /*
-        stat::=  ‘;’ | varlist ‘=’ explist | 
-		 functioncall | 
-		 label | 
-		 break | 
-		 goto Name | 
-		 do block end | 
-		 while exp do block end | 
-
-         repeat block until exp | 
-		 if exp then block {elseif exp then block}
-    [else block] end | 
-		 for Name ‘=’ exp ‘,’ exp[‘,’ exp] do block end | 
-		 for namelist in explist do block end | 
-
-         function funcname funcbody | 
-		 local function Name funcbody | 
-
-         local attnamelist[‘=’ explist]
-        */
+        /// <summary>
+        /// stat::=  ‘;’ |
+        ///    varlist ‘=’ explist | 
+		///    functioncall | 
+		///    label | 
+		///    'break' | 
+		///    'goto' Name | 
+		///    'do' block 'end' | 
+		///    'while' exp 'do' block 'end' | 
+        ///    'repeat' block 'until' exp | 
+		///    'if' exp 'then' block {'elseif' exp 'then' block} [else block] 'end' | 
+		///    'for' Name ‘=’ exp ‘,’ exp [‘,’ exp] 'do' block 'end' | 
+		///    'for' namelist 'in' explist 'do' block 'end' | 
+        ///    'function' funcname funcbody | 
+		///    'local' 'function' Name funcbody | 
+        ///    'local' attnamelist[‘=’ explist]
+        /// </summary>
         static readonly Func<Production> stat = () => _(nameof(stat), @NotImplemented);
-        /*
-    attnamelist::=  Name attrib {‘,’ Name attrib }
 
-    attrib::= [‘<’ Name ‘>’]
-        */
+        /// <summary>
+        /// attnamelist::=  Name attrib {‘,’ Name attrib }
+        /// </summary>
+        static readonly Func<Production> attnamelist = () => _(nameof(attnamelist), All(Name, attrib, ZeroOrMore(',', Name, attrib)));
+
+        /// <summary>
+        /// attrib::= [‘<’ Name ‘>’]
+        /// </summary>
+        static readonly Func<Production> attrib = () => _(nameof(attrib), Optional('<', Name, '>'));
 
         /// <summary>
         /// retstat::= return [explist] [‘;’]
         /// </summary>
         static readonly Func<Production> retstat = () => _(nameof(retstat), @NotImplemented);
-    /*
-    label::= ‘::’ Name ‘::’
 
-	funcname::= Name {‘.’ Name
-}
-[‘:’ Name]
+        /// <summary>
+        /// label::= ‘::’ Name ‘::’
+        /// </summary>
+        static readonly Func<Production> label = () => _(nameof(label), All("::", Name, "::"));
 
-varlist::= var {‘,’ var}
+        /// <summary>
+        /// funcname::= Name {‘.’ Name } [‘:’ Name]
+        /// </summary>
+        static readonly Func<Production> funcname = () => _(nameof(funcname), All(Name, ZeroOrMore('.', Name), Optional(':', Name)));
+        
+        /// <summary>
+        /// varlist::= var {‘,’ var}
+        /// </summary>
+        static readonly Func<Production> varlist = () => _(nameof(varlist), @NotImplemented);
 
-	var::= Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
+	    /// <summary>
+        /// var::= Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
+        /// </summary>
+        static readonly Func<Production> var = () => _(nameof(var), @NotImplemented);
 
-    namelist ::= Name {‘,’ Name}
+        /// <summary>
+        /// namelist ::= Name {‘,’ Name}
+        /// </summary>
+        static readonly Func<Production> namelist = () => _(nameof(namelist), @NotImplemented);
 
-explist::= exp {‘,’ exp}
+        /// <summary>
+        /// explist::= exp {‘,’ exp}
+        /// </summary>
+        static readonly Func<Production> explist = () => _(nameof(explist), @NotImplemented);
 
-exp::= nil | false | true | Numeral | LiteralString | ‘...’ | functiondef |
-     prefixexp | tableconstructor | exp binop exp | unop exp 
+        /// <summary>
+        /// exp::= 'nil' | 'false' | 'true' | Numeral | LiteralString | ‘...’ | functiondef | prefixexp | tableconstructor | exp binop exp | unop exp
+        /// </summary>
+        static readonly Func<Production> exp = () => _(nameof(exp), @NotImplemented);
 
-	prefixexp ::= var | functioncall | ‘(’ exp ‘)’
+        /// <summary>
+        /// prefixexp ::= var | functioncall | ‘(’ exp ‘)’
+        /// </summary>
+        static readonly Func<Production> prefixexp = () => _(nameof(prefixexp), @NotImplemented);
 
-	functioncall::= prefixexp args | prefixexp ‘:’ Name args 
+        /// <summary>
+        /// functioncall::= prefixexp args | prefixexp ‘:’ Name args
+        /// </summary>
+        static readonly Func<Production> functioncall = () => _(nameof(functioncall), @NotImplemented);
 
-	args ::=  ‘(’ [explist] ‘)’ | tableconstructor | LiteralString
+        /// <summary>
+        /// args ::=  ‘(’ [explist] ‘)’ | tableconstructor | LiteralString
+        /// </summary>
+        static readonly Func<Production> args = () => _(nameof(args), @NotImplemented);
 
+        /// <summary>
+        /// functiondef::= function funcbody
+        /// </summary>
+        static readonly Func<Production> functiondef = () => _(nameof(functiondef), @NotImplemented);
 
-    functiondef::= function funcbody
+        /// <summary>
+        /// funcbody ::= ‘(’ [parlist] ‘)’ block end
+        /// </summary>
+        static readonly Func<Production> funcbody = () => _(nameof(funcbody), @NotImplemented);
 
-    funcbody ::= ‘(’ [parlist] ‘)’ block end
+        /// <summary>
+        /// parlist ::= namelist [‘,’ ‘...’] | ‘...’
+        /// </summary>
+        static readonly Func<Production> parlist = () => _(nameof(parlist), @NotImplemented);
 
-	parlist ::= namelist [‘,’ ‘...’] | ‘...’
+        /// <summary>
+        /// tableconstructor::= ‘{’ [fieldlist] ‘}’
+        /// </summary>
+        static readonly Func<Production> tableconstructor = () => _(nameof(tableconstructor), @NotImplemented);
 
-	tableconstructor::= ‘{’ [fieldlist] ‘}’
+        /// <summary>
+        /// fieldlist::= field { fieldsep field} [fieldsep]
+        /// </summary>
+        static readonly Func<Production> fieldlist = () => _(nameof(fieldlist), @NotImplemented);
 
-	fieldlist::= field { fieldsep field}
-[fieldsep]
+        /// <summary>
+        /// field::= ‘[’ exp ‘]’ ‘=’ exp | Name ‘=’ exp | exp
+        /// </summary>
+        static readonly Func<Production> field = () => _(nameof(field), @NotImplemented);
 
-//field::= ‘[’ exp ‘]’ ‘=’ exp | Name ‘=’ exp | exp
+        /// <summary>
+        /// fieldsep::= ‘,’ | ‘;’
+        /// </summary>
+        static readonly Func<Production> fieldsep = () => _(nameof(fieldsep), @NotImplemented);
 
+        /// <summary>
+        /// binop::=  ‘+’ | ‘-’ | ‘*’ | ‘/’ | ‘//’ | ‘^’ | ‘%’ | 
+        ///	 ‘&’ | ‘~’ | ‘|’ | ‘>>’ | ‘<<’ | ‘..’ |
+        ///	 ‘<’ | ‘<=’ | ‘>’ | ‘>=’ | ‘==’ | ‘~=’ |
+        ///     and | or
+        /// </summary>
+        static readonly Func<Production> binop = () => _(nameof(binop), @NotImplemented);
 
-    //fieldsep::= ‘,’ | ‘;’
-
-	//binop::=  ‘+’ | ‘-’ | ‘*’ | ‘/’ | ‘//’ | ‘^’ | ‘%’ | 
-	//	 ‘&’ | ‘~’ | ‘|’ | ‘>>’ | ‘<<’ | ‘..’ |
-	//	 ‘<’ | ‘<=’ | ‘>’ | ‘>=’ | ‘==’ | ‘~=’ |
-    //     and | or
-
-        */
-        //unop ::= ‘-’ | not | ‘#’ | ‘~’
+        /// <summary>
+        /// unop ::= ‘-’ | not | ‘#’ | ‘~’
+        /// </summary>
         static readonly Func<Production> unop = () => AnyOf('-', "not", '#', '~');
+
+        /// <summary>
+        /// 
+        /// </summary>
+        static readonly Func<Production> Name = () => All(AnyOf('_', LETTER), ZeroOrMore(AnyOf('_', DIGIT_OR_LETTER)));
     }
 
     #endregion
