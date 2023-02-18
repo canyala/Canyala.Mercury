@@ -147,8 +147,10 @@ public partial class Turtle : Parser<Turtle.Producer>
 
     #region Grammar Production Declarations
 
-    /* Production declarations */
-
+    /// <summary>
+    /// Productions declare terse turtle production rules
+    /// based on the bnf grammar section at https://www.w3.org/TR/turtle/
+    /// </summary>
     private class Productions
     {
         /// <summary>
