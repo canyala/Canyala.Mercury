@@ -118,6 +118,10 @@ public class Sparql : Parser<Query.Builder>
     in a function call.
     */
 
+    /// <summary>
+    /// Productions declare sparql production rules
+    /// based on the bnf grammar section at https://www.w3.org/TR/sparql11-query/#grammar
+    /// </summary>
     private class Productions
     {
         // [1] ROOT! QueryUnit	  ::=  	Query

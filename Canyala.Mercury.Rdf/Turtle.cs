@@ -149,7 +149,7 @@ public partial class Turtle : Parser<Turtle.Producer>
 
     /// <summary>
     /// Productions declare terse turtle production rules
-    /// based on the bnf grammar section at https://www.w3.org/TR/turtle/
+    /// based on the bnf grammar section at https://www.w3.org/TR/turtle/#sec-grammar
     /// </summary>
     private class Productions
     {
