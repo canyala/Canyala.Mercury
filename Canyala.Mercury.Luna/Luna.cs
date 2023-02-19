@@ -26,8 +26,8 @@
 
 using System;
 using System.Xml.Linq;
+
 using Canyala.Mercury.Core.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Canyala.Mercury.Luna;
 
@@ -48,8 +48,11 @@ public partial class Luna : Parser<Luna.Producer>
     /// based on the Lua bnf grammar.
     /// </summary>
     /// <seealso cref="https://www.lua.org/manual/5.4/manual.html#9"/>
-    private class Productions
+    private static class Productions
     {
+        /// <summary>
+        ///  A 'not implemented' production to allow compile.
+        /// </summary>
         static readonly Func<Production> @NotImplemented = () => Call((_, _) => throw new NotImplementedException());
 
         /// <summary>

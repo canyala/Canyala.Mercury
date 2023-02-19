@@ -152,7 +152,7 @@ public partial class Turtle : Parser<Turtle.Producer>
     /// based on the terse turtle bnf grammar.
     /// </summary>
     /// <seealso cref="https://www.w3.org/TR/turtle/#sec-grammar"/>
-    private class Productions
+    private static class Productions
     {
         /// <summary>
         /// ROOT! turtleDoc ::= statement* 

@@ -124,7 +124,7 @@ public class Sparql : Parser<Query.Builder>
     /// based on the sparql bnf grammar.
     /// </summary>
     /// <seealso cref="https://www.w3.org/TR/sparql11-query/#grammar"/>
-    private class Productions
+    private static class Productions
     {
         // [1] ROOT! QueryUnit	  ::=  	Query
         public static readonly Func<Production> QueryUnit = () => _(nameof(QueryUnit), Query);

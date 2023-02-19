@@ -647,6 +647,11 @@ public abstract class Parser<T>
         }
     }
 
+    protected class P : Production
+    {
+        // No implementation
+    }
+
     #endregion
 
     #region Standard production declaration primitives
