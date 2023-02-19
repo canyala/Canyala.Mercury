@@ -1,3 +1,6 @@
 [submodule "Canyala.Lagoon"]
 	path = Canyala.Lagoon
 	url = https://github.com/canyala/Canyala.Lagoon.git
+[submodule "Canyala.Test"]
+	path = Canyala.Test
+	url = https://github.com/canyala/Canyala.Test.git
