@@ -170,7 +170,7 @@ public partial class Luna : Parser<Luna.Producer>
         static readonly Func<Production> tableconstructor = () => _(nameof(tableconstructor), @NotImplemented);
 
         /// <summary>
-        /// fieldlist::= field { fieldsep field} [fieldsep]
+        /// fieldlist::= field { fieldsep field } [fieldsep]
         /// </summary>
         static readonly Func<Production> fieldlist = () => _(nameof(fieldlist), @NotImplemented);
 
