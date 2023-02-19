@@ -29,6 +29,8 @@
 
 using BenchmarkDotNet.Attributes;
 
+Console.WriteLine("Hello, World!");
+
 [MemoryDiagnoser]
 public class Benchmarks
 {
@@ -50,4 +52,4 @@ public class Benchmarks
     }
 }
 
-Console.WriteLine("Hello, World!");
+
