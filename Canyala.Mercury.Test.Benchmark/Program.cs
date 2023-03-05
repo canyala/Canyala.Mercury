@@ -27,29 +27,40 @@
 
 */
 
+using System;
+using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
-Console.WriteLine("Hello, World!");
-
-[MemoryDiagnoser]
-public class Benchmarks
+namespace Benchmarks;
+public class Md5VsSha256 
 {
-    [GlobalSetup]
-    public void GlobalSetup()
+    private const int N = 10000;
+    private readonly byte[] data;
+
+    private readonly SHA256 sha256 = SHA256.Create();
+    private readonly MD5 md5 = MD5.Create();
+
+    public Md5VsSha256() 
     {
-        //Write your initialization code here
+        data = new byte[N];
+        new Random(42).NextBytes(data);
     }
 
     [Benchmark]
-    public void MyFirstBenchmarkMethod()
-    {
-        //Write your code here   
-    }
+    public byte[] Sha256() => sha256.ComputeHash(data);
+
     [Benchmark]
-    public void MySecondBenchmarkMethod()
-    {
-        //Write your code here
-    }
+    public byte[] Md5() => md5.ComputeHash(data);
 }
 
-
+/// <summary>
+/// dotnet run -c Release
+/// </summary>
+class Program 
+{
+    public static void Main(string[] args)
+    {
+        var summary = BenchmarkRunner.Run<Md5VsSha256>();
+    }
+}
