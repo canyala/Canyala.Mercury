@@ -56,7 +56,9 @@ public abstract class Object : IDisposable
 
     public void Dispose()
     {
+        Console.WriteLine($"Object.Dispose()");
         Dispose(true);
+
         GC.SuppressFinalize(this);
     }
 

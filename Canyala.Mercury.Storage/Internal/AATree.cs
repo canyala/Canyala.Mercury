@@ -187,17 +187,22 @@ internal sealed class AATree
         {
             _lock.EnterWriteLock();
 
-            var reader = _heap.Reader(_headerOffset, HEADER_REFCOUNT);
-            var refCount = reader.ReadInt64();
+            if (_heap.CanBeAccessed)
+            {
+                var reader = _heap.Reader(_headerOffset, HEADER_REFCOUNT);
+                var refCount = reader.ReadInt64();
 
-            if (refCount == 0)
-                throw new InvalidOperationException("Decrease on a 0 refcount.");
+                if (refCount == 0)
+                    throw new InvalidOperationException("Decrease on a 0 refcount.");
 
-            refCount = refCount -  1L;
-            var writer = _heap.Writer(_headerOffset, HEADER_REFCOUNT);
-            writer.Write(refCount);
+                refCount = refCount -  1L;
+                var writer = _heap.Writer(_headerOffset, HEADER_REFCOUNT);
+                writer.Write(refCount);
 
-            return refCount;
+                return refCount;
+            }
+
+            return 0;
         }
         finally
         {
@@ -212,8 +217,11 @@ internal sealed class AATree
     /// <param name="freeData"></param>
     public void Destroy(Action<long[]> freeData)
     {
-        Clear(freeData);
-        _heap.Free(_headerOffset);
+        if (_heap.CanBeAccessed)
+        {
+            Clear(freeData);
+            _heap.Free(_headerOffset);
+        }
     }
 
     /// <summary>
