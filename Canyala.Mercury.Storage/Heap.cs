@@ -100,11 +100,6 @@ public sealed class Heap
     internal Stream Stream => _stream;
 
     /// <summary>
-    /// A heap can only be accessed if it is readable, writeable and seekable.
-    /// </summary>
-    public bool CanBeAccessed => _stream.CanRead && _stream.CanWrite && _stream.CanSeek;
-
-    /// <summary>
     /// Create a heap from a stream
     /// </summary>
     /// <param name="stream">Stream providing access to actual storage.</param>

@@ -52,29 +52,27 @@ public abstract class Object : IDisposable
     internal abstract void AddReference();
     internal abstract void Release();
 
-    private bool disposed = false;
+    private bool _disposed = false;
 
     public void Dispose()
     {
-        Console.WriteLine($"Object.Dispose()");
         Dispose(true);
-
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        try
+        if (_disposed)
         {
-            if (!disposed)
-            {
-                Release();
-            }
+            return;
         }
-        finally
+
+        if (disposing)
         {
-            disposed = true;
+            Release();
         }
+
+        _disposed = true;
     }
 
     ~Object()
