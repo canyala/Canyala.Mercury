@@ -115,7 +115,7 @@ public class EnvironmentTest
                 using (var graph = Graph.Create(environment, Seq.Of(Seq.Array("All", "good", "things"))))
                 {
                     var roots = environment.Roots.ToArray();    
-                    Assert.AreEqual("Default.OSP;Default.POS;Default.SPO;SingletonAllocatorOfString.Index", roots.Join(';'));
+                    Assert.AreEqual("Default.ObjectSubjectPredicate;Default.PredicateObjectSubject;Default.SubjectPredicateObject;SingletonAllocatorOfString.Index", roots.Join(';'));
                     Assert.AreEqual(1, graph.Count());
                 }
             }

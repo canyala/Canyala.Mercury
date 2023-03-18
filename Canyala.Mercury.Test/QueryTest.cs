@@ -70,7 +70,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -108,7 +108,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -147,7 +147,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -189,7 +189,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery1 = @"SELECT ?v WHERE { ?v ?p ""cat"" }";
         var actual1 = Sparql.Query(graph, sparqlQuery1);
@@ -219,7 +219,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -249,7 +249,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -275,7 +275,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -302,7 +302,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -326,7 +326,7 @@ public class QueryTest
     [TestMethod]
     public void QueryEmptyGroupPatternShouldWork()
     {
-        var graph = Graph.Create();
+        var graph = Graph.Create(true);
 
         var sparqlQuery = @"
 
@@ -357,7 +357,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -397,7 +397,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -441,7 +441,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -486,7 +486,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -531,7 +531,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -579,7 +579,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -630,7 +630,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -680,7 +680,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -731,7 +731,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -785,7 +785,7 @@ public class QueryTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -830,7 +830,7 @@ public class QueryTest
                 :book2  ns:price  23 .
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -872,7 +872,7 @@ public class QueryTest
                 :book2  ns:price  23 .
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -921,7 +921,7 @@ public class QueryTest
                 :book2  ns:price  23 .
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -966,7 +966,7 @@ public class QueryTest
                 _:b    foaf:surname     ""Hacker"" .
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -1007,7 +1007,7 @@ public class QueryTest
                 _:b    foaf:surname     ""Hacker"" .
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -1047,7 +1047,7 @@ public class QueryTest
                 :bob    rdf:type   foaf:Person .
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -1084,7 +1084,7 @@ public class QueryTest
                 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 

@@ -83,6 +83,8 @@ public class Graph : IEnumerable<string[]>, IDisposable
     internal readonly Index PredicateObjectSubject;
     internal readonly Index ObjectSubjectPredicate;
 
+    private const string Default = "Default";
+
     /// <summary>
     /// Creates a Graph by specifying an index builder.
     /// May be invoked from a deriving class specifying a custom index builder.
@@ -90,13 +92,17 @@ public class Graph : IEnumerable<string[]>, IDisposable
     /// <param name="indexFactory">A function that builds and returns an index.</param>
     internal Graph(Func<string, Index> indexFactory)
     {
-        SubjectPredicateObject = indexFactory("SPO");
-        PredicateObjectSubject = indexFactory("POS");
-        ObjectSubjectPredicate = indexFactory("OSP");
+        SubjectPredicateObject = indexFactory(nameof(SubjectPredicateObject));
+        PredicateObjectSubject = indexFactory(nameof(PredicateObjectSubject));
+        ObjectSubjectPredicate = indexFactory(nameof(ObjectSubjectPredicate));
     }
 
-    private Graph(Storage.Environment environment, string? instanceName, IEnumerable<string[]> triples) 
-        : this(propertyName => new HeapIndex(environment, "{0}.{1}".Args(instanceName ?? "Default", propertyName)))
+    private Graph(string instanceName, IEnumerable<string[]> triples)
+        : this(indexName => new ManagedIndex($"{instanceName ?? Default}.{indexName}"))
+        { triples.Do(triple => Assert(triple)); }
+
+    private Graph(Storage.Environment environment, string instanceName, IEnumerable<string[]> triples) 
+        : this(indexName => new HeapIndex(environment, $"{instanceName}.{indexName}"))
         { triples.Do(triple => Assert(triple)); }
 
     /// <summary>
@@ -246,26 +252,86 @@ public class Graph : IEnumerable<string[]>, IDisposable
 
     #endregion
 
-    public static Graph Create()
-        { return new Graph(Storage.Environment.Create(), null, Seq.Empty<string[]>()); }
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="useStreamMemory"></param>
+    /// <returns></returns>
+    public static Graph Create(bool useStreamMemory)
+    {
+        if (useStreamMemory)
+            return new Graph(Storage.Environment.Create(), Default, Seq.Empty<string[]>());
+        else
+            return new Graph(Default, Seq.Empty<string[]>());
+    }
 
-    public static Graph Create(IEnumerable<string[]> triples)
-        { return new Graph(Storage.Environment.Create(), "Default", triples); }
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="useStreamMemory"></param>
+    /// <param name="triples"></param>
+    /// <returns></returns>
+    public static Graph Create(bool useStreamMemory, IEnumerable<string[]> triples)
+    {
+        if (useStreamMemory)
+            return new Graph(Storage.Environment.Create(), Default, triples);
+        else
+            return new Graph(Default, triples);
+    }
 
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="useStreamMemory"></param>
+    /// <param name="name"></param>
+    /// <param name="triples"></param>
+    /// <returns></returns>
+    public static Graph Create(bool useStreamMemory, string name, IEnumerable<string[]> triples)
+    {
+        if (useStreamMemory)
+            return new Graph(Storage.Environment.Create(), name, triples);
+        else
+            return new Graph(name, triples);
+    }
+
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="environment"></param>
+    /// <param name="triples"></param>
+    /// <returns></returns>
     public static Graph Create(Storage.Environment environment, IEnumerable<string[]> triples)
-        { return new Graph(environment, null, triples); }
+        { return new Graph(environment, Default, triples); }
 
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="environment"></param>
+    /// <param name="name"></param>
+    /// <param name="triples"></param>
+    /// <returns></returns>
     public static Graph Create(Storage.Environment environment, string name, IEnumerable<string[]> triples)
         { return new Graph(environment, name, triples); }
 
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="environment"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static Graph Create(Storage.Environment environment, string name)
         { return new Graph(environment, name, Seq.Empty<string[]>()); }
 
+    /// <summary>
+    /// Create a graph instance.
+    /// </summary>
+    /// <param name="environment"></param>
+    /// <returns></returns>
     public static Graph Create(Storage.Environment environment)
-        { return new Graph(environment, null, Seq.Empty<string[]>()); }
+        { return new Graph(environment, Default, Seq.Empty<string[]>()); }
 
     /// <summary>
-    /// 
+    /// Create a graph instance.
     /// </summary>
     /// <param name="graph"></param>
     /// <returns></returns>

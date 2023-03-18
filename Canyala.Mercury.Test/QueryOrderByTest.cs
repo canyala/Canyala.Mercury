@@ -76,7 +76,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -104,7 +104,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -132,7 +132,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -160,7 +160,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -188,7 +188,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -216,7 +216,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -261,7 +261,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
         var letter = Namespace.FromUri("http://example/letter#");
 
@@ -312,7 +312,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
         var letter = Namespace.FromUri("http://example/letter#");
 
@@ -363,7 +363,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
         var letter = Namespace.FromUri("http://example/letter#");
 
@@ -414,7 +414,7 @@ public class QueryOrderByTest
 
             ";
 
-        var dataset = Graph.Create(triples);
+        var dataset = Graph.Create(true, triples);
         var actual = Sparql.Query(dataset, sparql);
         var letter = Namespace.FromUri("http://example/letter#");
 

@@ -52,10 +52,12 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
 {
     private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
     private readonly SortedManagedDictionary<string, SortedManagedDictionary<string, SortedManagedSet<string>>> _primaries;
+    private readonly string _name;
 
-    public ManagedIndex()
+    public ManagedIndex(string name)
     {
         _primaries = new SortedManagedDictionary<string, SortedManagedDictionary<string, SortedManagedSet<string>>>();
+        _name = name;
     }
 
     public void Add(string primary, string secondary, string ternary)

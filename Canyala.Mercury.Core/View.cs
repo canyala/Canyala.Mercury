@@ -129,7 +129,7 @@ internal class ConstrainedView : IView
             if (_constraint.Match(key))
             {
                 _magnitude++;
-                if (_min == null) _min = key;
+                if (_min.Length == 0) _min = key;
                 _max = key;
             }
     }

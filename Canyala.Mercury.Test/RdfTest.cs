@@ -109,7 +109,7 @@ public class RdfTest
             { "exmpl", exmpl }
         };
 
-        var graph = Graph.Create(ontology.AsRows());
+        var graph = Graph.Create(true, ontology.AsRows());
         foreach (var turtleLine in graph.AsTurtle(namespaces)) 
             Trace.WriteLine(turtleLine);
     }
@@ -123,7 +123,7 @@ public class RdfTest
             .Select(row => row.Select(column => column.Trim()))
             .Select(row => row.ToArray());
 
-        var graph = Graph.Create(fundDataTriples);
+        var graph = Graph.Create(true, fundDataTriples);
         var trend = graph.Enumerate("Carnegie Ryssland", null, null);
     }
 }

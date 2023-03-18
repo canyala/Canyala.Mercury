@@ -415,7 +415,7 @@ public class GraphTest
     [TestMethod]
     public void RangedEnumerationsShouldWorkInMemory()
     {
-        var graph = Graph.Create(GenerateTriples(new DateTime(2011, 1, 1), new DateTime(2013, 1, 19)));
+        var graph = Graph.Create(true, GenerateTriples(new DateTime(2011, 1, 1), new DateTime(2013, 1, 19)));
         var actual = graph.Enumerate("SEB TrendSafe Fund", Constraint.Between("2012-08-08", "2012-08-16"), null);
         Assert.AreEqual(9, actual.Count());
     }

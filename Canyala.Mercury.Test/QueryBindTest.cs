@@ -58,7 +58,7 @@ public class QueryBindTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
                 prefix :  <http://canyala.se/testing>

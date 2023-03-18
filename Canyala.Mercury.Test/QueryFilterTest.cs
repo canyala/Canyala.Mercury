@@ -66,7 +66,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -116,7 +116,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -165,7 +165,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -218,7 +218,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -272,7 +272,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -326,7 +326,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -379,7 +379,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 
@@ -433,7 +433,7 @@ public class QueryFilterTest
 
             ");
 
-        var graph = Graph.Create(turtleData);
+        var graph = Graph.Create(true, turtleData);
 
         var sparqlQuery = @"
 

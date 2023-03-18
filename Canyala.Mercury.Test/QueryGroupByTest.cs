@@ -72,7 +72,7 @@ public class QueryGroupByTest
                 GROUP BY ?org
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -117,7 +117,7 @@ public class QueryGroupByTest
                 GROUP BY ?org
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -163,7 +163,7 @@ public class QueryGroupByTest
                 HAVING (SUM(?lprice) > 10)
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -210,7 +210,7 @@ public class QueryGroupByTest
                 GROUP BY ?org
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -257,7 +257,7 @@ public class QueryGroupByTest
                 }
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -302,7 +302,7 @@ public class QueryGroupByTest
                 }
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -348,7 +348,7 @@ public class QueryGroupByTest
                 }
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -394,7 +394,7 @@ public class QueryGroupByTest
                 }
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
 
         var expected = new string[,]
@@ -441,7 +441,7 @@ public class QueryGroupByTest
                 GROUP BY ?org
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
         var ns = Namespace.FromUri("http://books.example/");
 
@@ -490,7 +490,7 @@ public class QueryGroupByTest
                 GROUP BY ?org
             ";
 
-        var dataset = Graph.Create(data);
+        var dataset = Graph.Create(true, data);
         var actual = Sparql.Query(dataset, sparql);
         var ns = Namespace.FromUri("http://books.example/");
 

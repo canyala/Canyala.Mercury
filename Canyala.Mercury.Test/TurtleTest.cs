@@ -51,7 +51,7 @@ public class TurtleTest
     public void TurtleSocialTTLShouldWork()
     {
         var socialTurtles = Turtle.FromLines(File.ReadLines(Context.TestFile("social.ttl")));
-        var graph = Graph.Create(socialTurtles.AsTriples());
+        var graph = Graph.Create(true, socialTurtles.AsTriples());
     }
 
     [TestMethod]
