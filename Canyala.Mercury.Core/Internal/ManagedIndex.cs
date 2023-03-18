@@ -47,28 +47,21 @@ namespace Canyala.Mercury.Core.Internal;
 
 /// <summary>
 /// Provides an index implementation using managed dictionaries and sets.
-/// This is not yet implemented, this implementation is a clone of HeapIndex.
 /// </summary>
 internal sealed class ManagedIndex : Graph.Index, IDisposable
 {
-    private readonly Storage.Environment _environment;
     private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-    private readonly SortedHeapDictionary<string, SortedHeapDictionary<string, SortedHeapSet<string>>> _primaries;
+    private readonly SortedManagedDictionary<string, SortedManagedDictionary<string, SortedManagedSet<string>>> _primaries;
 
-    public ManagedIndex(Storage.Environment environment)
+    public ManagedIndex()
     {
-        _primaries = new SortedHeapDictionary<string, SortedHeapDictionary<string, SortedHeapSet<string>>>(_environment = environment);
-    }
-
-    public ManagedIndex(Storage.Environment environment, string name)
-    { 
-        _primaries = new SortedHeapDictionary<string,SortedHeapDictionary<string,SortedHeapSet<string>>>(_environment = environment, name);
+        _primaries = new SortedManagedDictionary<string, SortedManagedDictionary<string, SortedManagedSet<string>>>();
     }
 
     public void Add(string primary, string secondary, string ternary)
     {
-        SortedHeapDictionary<string, SortedHeapSet<string>>? secondaryTernaries = null;
-        SortedHeapSet<string>? ternaries = null;
+        SortedManagedDictionary<string, SortedManagedSet<string>>? secondaryTernaries = null;
+        SortedManagedSet<string>? ternaries = null;
 
         try
         {
@@ -76,13 +69,13 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
 
             if (!_primaries.TryGetValue(primary, out secondaryTernaries))
             {
-                secondaryTernaries = new SortedHeapDictionary<string, SortedHeapSet<string>>(_environment);
+                secondaryTernaries = new SortedManagedDictionary<string, SortedManagedSet<string>>();
                 _primaries.Add(primary, secondaryTernaries);
             }
 
             if (!secondaryTernaries.TryGetValue(secondary, out ternaries))
             {
-                ternaries = new SortedHeapSet<string>(_environment);
+                ternaries = new SortedManagedSet<string>();
                 secondaryTernaries.Add(secondary, ternaries);
             }
 
@@ -90,8 +83,8 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
         }
         finally
         {
-            secondaryTernaries?.Dispose();
-            ternaries?.Dispose();
+            secondaryTernaries = null;
+            ternaries = null;
 
             _lock.ExitWriteLock();
         }
@@ -126,11 +119,11 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
                             else
                                 ternaries.Clear();
 
-                            ternaries.Dispose();
+                            ternaries = null;
                         }
                     }
 
-                    secondaryTernaries.Dispose();
+                    secondaryTernaries = null;
                 }
             }
         }
@@ -142,7 +135,7 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
 
     public bool Contains(string primary)
     {
-        SortedHeapDictionary<string, SortedHeapSet<string>>? secondaryTernary = null;
+        SortedManagedDictionary<string, SortedManagedSet<string>>? secondaryTernary = null;
 
         _lock.EnterReadLock();
 
@@ -156,7 +149,7 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
         finally
         {
             if (secondaryTernary != null)
-                secondaryTernary.Dispose();
+                secondaryTernary = null;
 
             _lock.ExitReadLock();
         }
@@ -164,8 +157,8 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
 
     public bool Contains(string primary, string secondary)
     {
-        SortedHeapDictionary<string, SortedHeapSet<string>>? secondaryTernary = null;
-        SortedHeapSet<string>? ternaries = null;
+        SortedManagedDictionary<string, SortedManagedSet<string>>? secondaryTernary = null;
+        SortedManagedSet<string>? ternaries = null;
 
         _lock.EnterReadLock();
 
@@ -182,10 +175,10 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
         finally
         {
             if (secondaryTernary != null)
-                secondaryTernary.Dispose();
+                secondaryTernary = null;
 
             if (ternaries != null)
-                ternaries.Dispose();
+                ternaries = null;
 
             _lock.ExitReadLock();
         }
@@ -193,8 +186,8 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
 
     public bool Contains(string primary, string secondary, string ternary)
     {
-        SortedHeapDictionary<string, SortedHeapSet<string>>? secondaryTernary = null;
-        SortedHeapSet<string>? ternaries = null;
+        SortedManagedDictionary<string, SortedManagedSet<string>>? secondaryTernary = null;
+        SortedManagedSet<string>? ternaries = null;
 
         _lock.EnterReadLock();
 
@@ -212,10 +205,10 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
         finally
         {
             if (secondaryTernary != null)
-                secondaryTernary.Dispose();
+                secondaryTernary = null;
 
             if (ternaries != null)
-                ternaries.Dispose();
+                ternaries = null;
 
             _lock.ExitReadLock();
         }
@@ -244,7 +237,7 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
                 return Seq.Array(new ConstrainedView(ternaries, ternary));
             }
 
-            secondaries.Dispose();
+            secondaries = null;
         }
 
         return Seq.Array<IView>();
@@ -264,7 +257,7 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
         { return new ConstrainedView(_primaries, constraint); }
 
     public void Dispose()
-        { _primaries.Dispose(); }
+        { _primaries.Clear(); }
 
     private IEnumerable<string[]> InternalEnumerate(Constraint.Specific primary, Constraint.Specific secondary, Constraint ternary)
     {
@@ -275,10 +268,10 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
                 foreach (var ternaryMatch in ternaries.ConstrainBy(ternary))
                     yield return Seq.Array(ternaryMatch);
 
-                ternaries.Dispose();
+                ternaries = null;
             }
 
-            secondaries.Dispose();
+            secondaries = null;
         }
     }
 
@@ -292,10 +285,10 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
                 foreach (var ternaryMatch in ternaries.ConstrainBy(ternary))
                     yield return Seq.Array(secondaryMatch.Key, ternaryMatch);
 
-                ternaries.Dispose();
+                ternaries = null;
             }
 
-            secondaries.Dispose();
+            secondaries = null;
         }
     }
 
@@ -310,10 +303,10 @@ internal sealed class ManagedIndex : Graph.Index, IDisposable
                 foreach (var ternaryMatch in ternaries.ConstrainBy(ternary))
                     yield return Seq.Array(primaryMatch.Key, secondaryMatch.Key, ternaryMatch);
 
-                ternaries.Dispose();
+                ternaries = null;
             }
 
-            secondaries.Dispose();
+            secondaries = null;
         }
     }
 }
