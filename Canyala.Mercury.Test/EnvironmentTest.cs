@@ -57,21 +57,20 @@ public class EnvironmentTest
     {
         var socialTurtles = Turtle.FromLines(File.ReadLines(Context.TestFile("social.ttl")));
 
-        using (var temp = Context.GetTemporary())
+        using var temp = Context.GetTemporary();
+        
+        int tripleCount;
+
+        using (var envPre = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
         {
-            int tripleCount;
+            var graph = Graph.Create(envPre, "Test", socialTurtles.AsTriples());
+            tripleCount = graph.Count();
+        }
 
-            using (var envPre = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
-            {
-                var graph = Graph.Create(envPre, "Test", socialTurtles.AsTriples());
-                tripleCount = graph.Count();
-            }
-
-            using (var envPost = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
-            {
-                var graph = Graph.Create(envPost, "Test");
-                Assert.AreEqual(tripleCount, graph.Count());
-            }
+        using (var envPost = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
+        {
+            var graph = Graph.Create(envPost, "Test");
+            Assert.AreEqual(tripleCount, graph.Count());
         }
     }
 
@@ -80,45 +79,39 @@ public class EnvironmentTest
     {
         long used;
 
-        using (var temp = Context.GetTemporary())
+        using var temp = Context.GetTemporary();
+        
+        using (var envPre = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
         {
-            using (var envPre = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
+            using (var graph1 = Graph.Create(envPre))
             {
-                using (var graph1 = Graph.Create(envPre))
+                using (var graph2 = Graph.Create(envPre, Seq.Of(Seq.Array("Alla", "Goda", "Ting"))))
                 {
-                    using (var graph2 = Graph.Create(envPre, Seq.Of(Seq.Array("Alla", "Goda", "Ting"))))
-                    {
-                        long free2 = envPre.CountFreeBlocks();
-                        long used2 = envPre.CountUsedBlocks();
-                    }
-
-                    used = envPre.CountUsedBlocks();
+                    long free2 = envPre.CountFreeBlocks();
+                    long used2 = envPre.CountUsedBlocks();
                 }
-            }
 
-            using (var envPost = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
-            {
-                var graph1 = Graph.Create(envPost);
-                var actualUsed = envPost.CountUsedBlocks();
-                Assert.AreEqual(used, actualUsed);
+                used = envPre.CountUsedBlocks();
             }
+        }
+
+        using (var envPost = Environment.Create(Strategy.SinglestoreInFile(124 * 1024, temp.FilePath)))
+        {
+            var graph1 = Graph.Create(envPost);
+            var actualUsed = envPost.CountUsedBlocks();
+            Assert.AreEqual(used, actualUsed);
         }
     }
 
     [TestMethod]
     public void EnvironmentsMustSupportRootEnumeration()
     {
-        using (var temp = Context.GetTemporary())
-        {
-            using (var environment = Environment.Create(Strategy.SinglestoreInFile(1024 * 1024, temp.FilePath)))
-            {
-                using (var graph = Graph.Create(environment, Seq.Of(Seq.Array("All", "good", "things"))))
-                {
-                    var roots = environment.Roots.ToArray();    
-                    Assert.AreEqual("Default.ObjectSubjectPredicate;Default.PredicateObjectSubject;Default.SubjectPredicateObject;SingletonAllocatorOfString.Index", roots.Join(';'));
-                    Assert.AreEqual(1, graph.Count());
-                }
-            }
-        }
+        using var temp = Context.GetTemporary();
+        using var environment = Environment.Create(Strategy.SinglestoreInFile(1024 * 1024, temp.FilePath));
+        using var graph = Graph.Create(environment, Seq.Of(Seq.Array("All", "good", "things")));
+
+        var roots = environment.Roots.ToArray();    
+        Assert.AreEqual("Default.ObjectSubjectPredicate;Default.PredicateObjectSubject;Default.SubjectPredicateObject;SingletonAllocatorOfString.Index", roots.Join(';'));
+        Assert.AreEqual(1, graph.Count());
     }
 }

@@ -22,9 +22,9 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
         _name = name;
     }
 
-    public TKey Min => throw new NotImplementedException();
+    public TKey? Min => Keys.Min();
 
-    public TKey Max => throw new NotImplementedException();
+    public TKey? Max => Keys.Max();
 
     public long Magnitude => throw new NotImplementedException();
 
@@ -33,10 +33,7 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
         throw new NotImplementedException();
     }
 
-    public bool Contains(TKey element)
-    {
-        throw new NotImplementedException();
-    }
+    public bool Contains(TKey element) => ContainsKey(element);
 
     public IEnumerable<KeyValuePair<TKey, TValue>> Enumerate(TKey startAt, bool ascending, bool inclusive)
     {
@@ -45,17 +42,22 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
 
     public IEnumerable<KeyValuePair<TKey, TValue>> Enumerate(TKey from, TKey to, bool ascending, bool inclusive)
     {
-        throw new NotImplementedException();
+        var enumerator = GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            yield return enumerator.Current;
+        }
     }
 
     public IEnumerable<TKey> Enumerate()
     {
-        throw new NotImplementedException();
+        return Keys;
     }
 
     public TKey KeyOf(KeyValuePair<TKey, TValue> element)
     {
-        throw new NotImplementedException();
+        return element.Key;
     }
 
     public bool TryGet(TKey key, out KeyValuePair<TKey, TValue> value)
