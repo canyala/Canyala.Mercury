@@ -277,8 +277,8 @@ public abstract class Constraint
 
         public override IEnumerable<T> Enumerate<T>(IOrderedCollection<string, T> collection)
         {
-            IKeyCollection<string>? small = null;
-            IKeyCollection<string>? large = null;
+            IKeyCollection<string>? small;
+            IKeyCollection<string>? large;
 
             if (collection.Magnitude > _view.Magnitude)
             {
@@ -291,16 +291,19 @@ public abstract class Constraint
                 large = _view;
             }
 
-            foreach (var key in small.Between(large.Min, large.Max))
+            if (small != null && large != null && large.Min != null && large.Max != null)
             {
-                // TODO: Optimize 'inside' so that we avoid duplicate true accesses in small or large.
-
-                if (large.Contains(key))
+                foreach(var key in small.Between(large.Min, large.Max))
                 {
-                    if (!collection.TryGet(key, out T item))
-                        throw new KeyNotFoundException("Internal error. Backing collection failed to access the expected key.");
+                    // TODO: Optimize 'inside' so that we avoid duplicate true accesses in small or large.
 
-                    yield return item;
+                    if (large.Contains(key))
+                    {
+                        if(!collection.TryGet(key, out T item))
+                            throw new KeyNotFoundException("Internal error. Backing collection failed to access the expected key.");
+
+                        yield return item;
+                    }
                 }
             }
         }

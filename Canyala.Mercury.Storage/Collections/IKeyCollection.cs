@@ -34,8 +34,8 @@ namespace Canyala.Mercury.Storage.Collections;
 
 public interface IKeyCollection<T>
 {
-    T Min { get; }
-    T Max { get; }
+    T? Min { get; }
+    T? Max { get; }
     long Magnitude { get; }
     bool Contains(T element);
     IEnumerable<T> Between(T low, T high);

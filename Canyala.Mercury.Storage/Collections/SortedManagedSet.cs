@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Canyala.Mercury.Storage.Collections;
 
@@ -7,52 +8,76 @@ namespace Canyala.Mercury.Storage.Collections;
 /// Provides a persisted generic set.
 /// </summary>
 /// <typeparam name="T">Element type.</typeparam>
-public class SortedManagedSet<T> : SortedSet<T>, IOrderedCollection<T, T>
+public class SortedManagedSet<T> : SortedSet<T>, IOrderedCollection<T, T>, IDisposable
     where T : notnull, IComparable, IComparable<T>
 {
-	public SortedManagedSet()
+    private bool disposedValue;
+
+    public SortedManagedSet()
 	{
 	}
 
-    T IKeyCollection<T>.Min => throw new NotImplementedException();
+    public bool this[T item] => Contains(item);
 
-    T IKeyCollection<T>.Max => throw new NotImplementedException();
+    public long Magnitude => throw new NotImplementedException();
 
-    long IKeyCollection<T>.Magnitude => throw new NotImplementedException();
-
-    IEnumerable<T> IKeyCollection<T>.Between(T low, T high)
+    public IEnumerable<T> Between(T low, T high)
     {
         throw new NotImplementedException();
     }
 
-    bool IKeyCollection<T>.Contains(T element)
+    public IEnumerable<T> Enumerate(T startAt, bool ascending, bool inclusive)
     {
         throw new NotImplementedException();
     }
 
-    IEnumerable<T> IOrderedCollection<T, T>.Enumerate(T startAt, bool ascending, bool inclusive)
+    public IEnumerable<T> Enumerate(T from, T to, bool ascending, bool inclusive)
     {
         throw new NotImplementedException();
     }
 
-    IEnumerable<T> IOrderedCollection<T, T>.Enumerate(T from, T to, bool ascending, bool inclusive)
+    public IEnumerable<T> Enumerate()
     {
         throw new NotImplementedException();
     }
 
-    IEnumerable<T> IKeyCollection<T>.Enumerate()
+    public T KeyOf(T element)
     {
         throw new NotImplementedException();
     }
 
-    T IOrderedCollection<T, T>.KeyOf(T element)
+    public bool TryGet(T key, out T value)
     {
         throw new NotImplementedException();
     }
 
-    bool IOrderedCollection<T, T>.TryGet(T key, out T value)
+    protected virtual void Dispose(bool disposing)
     {
-        throw new NotImplementedException();
+        if(!disposedValue)
+        {
+            if(disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            disposedValue = true;
+        }
+    }
+
+    // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+    // ~SortedManagedSet()
+    // {
+    //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+    //     Dispose(disposing: false);
+    // }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }
 

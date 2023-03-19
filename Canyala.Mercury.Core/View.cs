@@ -79,10 +79,10 @@ public class View : IView, IEnumerable<string>
         { _view = view; }
 
     public string Min
-        { get { return _view.Min; } }
+        { get { return _view.Min ?? string.Empty; } }
 
     public string Max
-        { get { return _view.Max; } }
+        { get { return _view.Max ?? string.Empty; } }
 
     public long Magnitude
         { get { return _view.Magnitude; } }
