@@ -9,8 +9,9 @@ namespace Canyala.Mercury.Storage.Collections;
 public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TValue>, IOrderedCollection<TKey, KeyValuePair<TKey, TValue>>, IDisposable
     where TKey : notnull, IComparable<TKey>
 {
-    private bool _disposedValue;
     private readonly string _name;
+
+    private bool _disposedValue;
 
     /// <summary>
     /// 
@@ -42,7 +43,7 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
     /// <summary>
     /// 
     /// </summary>
-    public long Magnitude => throw new NotImplementedException();
+    public long Magnitude => 1;
 
     /// <summary>
     /// 
@@ -54,9 +55,10 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
     public IEnumerable<TKey> Between(TKey low, TKey high)
     {
         var enumerator = GetEnumerator();
+        bool hasCurrent = false;
         int relativeOrder = 0;
 
-        while (enumerator.MoveNext())
+        while (hasCurrent = enumerator.MoveNext())
         {
             relativeOrder = enumerator.Current.Key.CompareTo(low);
 
@@ -66,9 +68,10 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
             break;
         }
 
-        yield return enumerator.Current.Key;
+        if (hasCurrent)
+            yield return enumerator.Current.Key;
 
-        while (enumerator.MoveNext())
+        while (hasCurrent = enumerator.MoveNext())
         {
             relativeOrder = enumerator.Current.Key.CompareTo(high);
 
@@ -81,7 +84,7 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
             break;
         }
 
-        if (relativeOrder == 0)
+        if (hasCurrent && relativeOrder == 0)
             yield return enumerator.Current.Key;
     }
 
@@ -102,7 +105,50 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
     /// <exception cref="NotImplementedException"></exception>
     public IEnumerable<KeyValuePair<TKey, TValue>> Enumerate(TKey startAt, bool ascending, bool inclusive)
     {
-        throw new NotImplementedException();
+        var enumerator = GetEnumerator();
+        bool hasCurrent = false;
+        int relativeOrder = 0;
+
+        while (hasCurrent = enumerator.MoveNext())
+        {
+            relativeOrder = enumerator.Current.Key.CompareTo(startAt);
+
+            if (relativeOrder < 0)
+                continue;
+
+            break;
+        }
+
+        if (ascending)
+        {
+            if (hasCurrent)
+            { 
+                if (relativeOrder == 0 && inclusive || relativeOrder > 0)
+                    yield return enumerator.Current;
+
+                while (enumerator.MoveNext())
+                    yield return enumerator.Current;
+            }
+
+            yield break;
+        }
+
+        if (hasCurrent)
+        {
+            Stack<KeyValuePair<TKey, TValue>> keyValuePairs = new();
+
+            if (relativeOrder == 0 && inclusive || relativeOrder > 0)
+                keyValuePairs.Push(enumerator.Current);
+
+            while (hasCurrent = enumerator.MoveNext())
+            {
+                keyValuePairs.Push(enumerator.Current);
+            }
+
+            KeyValuePair<TKey, TValue> keyValuePair;
+            while (keyValuePairs.TryPop(out keyValuePair))
+                yield return keyValuePair;
+        }
     }
 
     /// <summary>
@@ -171,14 +217,12 @@ public class SortedManagedDictionary<TKey, TValue> : SortedDictionary<TKey, TVal
             break;
         }
 
-        if (relativeOrder == 0 && inclusive)
+        if (hasCurrent && relativeOrder == 0 && inclusive)
             yield return enumerator.Current;
 
         KeyValuePair<TKey, TValue> keyValuePair;
         while (keyValuePairs.TryPop(out keyValuePair))
             yield return keyValuePair;
-
-        yield break;
     }
 
     /// <summary>
