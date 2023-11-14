@@ -1,5 +1,5 @@
 ﻿# Canyala.Mercury
-Canyala.Mercury is a .NET implementation of RDF with SPARQL, Terse TURTLE and RDF GRAPH DB implementations.
+Canyala.Mercury is a cross platform .NET implementation of RDF with SPARQL, Terse TURTLE and RDF GRAPH DB implementations.
 It began as an experiment to find out if it was possible to declare BNF in C# with an internal DSL, which it was, as an alternative to bloated lexer and parser implementations.
 The same basic Parser base class is used to implement both terse turtle and sparql engines.
 An other interesting candidate for a Mercury Parser based implementation is Lua script.
